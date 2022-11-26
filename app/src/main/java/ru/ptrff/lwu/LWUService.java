@@ -81,6 +81,7 @@ public class LWUService extends WallpaperService {
                 return;
             }
 
+
             if (visible) {
                 //myWebView.loadUrl("javascript:resumeWallpaper()");
             } else {
@@ -117,8 +118,7 @@ public class LWUService extends WallpaperService {
 
             myJSInterface = new LWUJSInterface(this);
             myWebView.addJavascriptInterface(myJSInterface, "androidWallpaperInterface");
-
-
+            myWebView.loadUrl("file:///android_asset/wallpaper.html");
 
 
             // Create message receiver

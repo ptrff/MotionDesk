@@ -1,4 +1,10 @@
 var animationFrame;
+var r = 10;
+var g = 50;
+var b = 10;
+var tomax = 1;
+
+
 function makeid(length) {
     var result           = '';
     var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -9,18 +15,44 @@ function makeid(length) {
     return result;
 }
 
-function a(){
-button.style.color = "#FF0000";
-}
+a = document.getElementById('text');
 
-button = document.getElementById('test')
-button.addEventListener("click", a);
 function frame() {
   animationFrame = requestAnimationFrame(frame);
 
+  a.innerHTML = makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18)
+  +makeid(19)+"&lt;PTRFF&gt;"+makeid(18)+makeid(19)+"&lt;PTRFF&gt;"+makeid(18);
+
+  if(tomax == 1){
+   g++;
+   if(g==90) tomax = 0;
+  }else{
+   g--;
+   if(g==50) tomax = 1;
+  }
 
 
-  // Let the host app know
+  a.style.color = "#"+r+g+b;
+
+
   window.androidWallpaperInterface.drawFrame();
 }
 
