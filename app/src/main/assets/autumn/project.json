@@ -1,0 +1,211 @@
+{
+	"contentrating" : "Everyone",
+	"description" : "Parametric Live Wallpaper for\n\"Wallpaper Engine\".\n\n15+ Parameters:\nMuse position, Sun rays and bloom, leaves, trees, fireflies, etc.\n\nCreated for experimentation purpose.\nSource based on OutsideOfSociety's experiment.",
+	"file" : "index.html",
+	"general" : 
+	{
+		"properties" : 
+		{
+			"bloomstrength" : 
+			{
+				"fraction" : true,
+				"index" : 12,
+				"max" : 1,
+				"min" : 0,
+				"order" : 112,
+				"precision" : 2,
+				"step" : 0.1,
+				"text" : "Bloom: Strength",
+				"type" : "slider",
+				"value" : 0.7
+			},
+			"cameraheight" : 
+			{
+				"fraction" : false,
+				"index" : 7,
+				"max" : 3000,
+				"min" : 200,
+				"order" : 107,
+				"text" : "Camera: Height",
+				"type" : "slider",
+				"value" : 2000
+			},
+			"cameratype" : 
+			{
+				"index" : 8,
+				"options" : 
+				[
+					{
+						"label" : "Straight",
+						"value" : "true"
+					},
+					{
+						"label" : "Reverse",
+						"value" : "false"
+					}
+				],
+				"order" : 108,
+				"text" : "Camera: Type",
+				"type" : "combo",
+				"value" : "true"
+			},
+			"firefliesamount" : 
+			{
+				"fraction" : false,
+				"index" : 4,
+				"max" : 4000,
+				"min" : 0,
+				"order" : 104,
+				"text" : "Fireflies: Amount",
+				"type" : "slider",
+				"value" : 1000
+			},
+			"firefliescolor" : 
+			{
+				"index" : 6,
+				"order" : 106,
+				"text" : "Fireflies: Color",
+				"type" : "color",
+				"value" : "0 0.8784313725490196 1"
+			},
+			"firefliesspeed" : 
+			{
+				"fraction" : true,
+				"index" : 5,
+				"max" : 1,
+				"min" : 0,
+				"order" : 105,
+				"precision" : 2,
+				"step" : 0.1,
+				"text" : "Fireflies: Speed",
+				"type" : "slider",
+				"value" : 1
+			},
+			"leavesamount" : 
+			{
+				"fraction" : false,
+				"index" : 2,
+				"max" : 60000,
+				"min" : 0,
+				"order" : 102,
+				"text" : "Leaves: Amount",
+				"type" : "slider",
+				"value" : 30000
+			},
+			"leavesspeed" : 
+			{
+				"fraction" : true,
+				"index" : 3,
+				"max" : 1,
+				"min" : 0,
+				"order" : 103,
+				"precision" : 2,
+				"step" : 0.1,
+				"text" : "Leaves: Speed",
+				"type" : "slider",
+				"value" : 1
+			},
+			"lensdirtopacity" : 
+			{
+				"fraction" : true,
+				"index" : 10,
+				"max" : 1,
+				"min" : 0,
+				"order" : 110,
+				"precision" : 2,
+				"step" : 0.1,
+				"text" : "Lensdirt: Opacity",
+				"type" : "slider",
+				"value" : 1
+			},
+			"lensflareopacity" : 
+			{
+				"fraction" : true,
+				"index" : 9,
+				"max" : 1,
+				"min" : 0,
+				"order" : 109,
+				"precision" : 2,
+				"step" : 0.1,
+				"text" : "Lensflare: Opacity",
+				"type" : "slider",
+				"value" : 1
+			},
+			"mousesensitivity" : 
+			{
+				"fraction" : true,
+				"index" : 14,
+				"max" : 1,
+				"min" : 0,
+				"order" : 114,
+				"precision" : 2,
+				"step" : 0.1,
+				"text" : "Mouse: Sensitivity",
+				"type" : "slider",
+				"value" : 0.5
+			},
+			"mousespeed" : 
+			{
+				"fraction" : true,
+				"index" : 13,
+				"max" : 20,
+				"min" : 0,
+				"order" : 113,
+				"precision" : 2,
+				"step" : 0.1,
+				"text" : "Mouse: Speed",
+				"type" : "slider",
+				"value" : 10
+			},
+			"raysopacity" : 
+			{
+				"fraction" : true,
+				"index" : 11,
+				"max" : 1,
+				"min" : 0,
+				"order" : 111,
+				"precision" : 2,
+				"step" : 0.1,
+				"text" : "Rays: Opacity",
+				"type" : "slider",
+				"value" : 0.5
+			},
+			"schemecolor" : 
+			{
+				"order" : 0,
+				"text" : "ui_browse_properties_scheme_color",
+				"type" : "color",
+				"value" : "0.7686274509803922 0.4980392156862745 0"
+			},
+			"treesamount" : 
+			{
+				"fraction" : false,
+				"index" : 0,
+				"max" : 40,
+				"min" : 0,
+				"order" : 100,
+				"text" : "Trees: Amount",
+				"type" : "slider",
+				"value" : 16
+			},
+			"treescolor" : 
+			{
+				"fraction" : true,
+				"index" : 1,
+				"max" : 1,
+				"min" : 0,
+				"order" : 101,
+				"precision" : 2,
+				"step" : 0.1,
+				"text" : "Trees: Color",
+				"type" : "slider",
+				"value" : 0
+			}
+		}
+	},
+	"preview" : "preview.gif",
+	"tags" : [ "Nature" ],
+	"title" : "Autumn Parametric",
+	"type" : "web",
+	"version" : 0
+}

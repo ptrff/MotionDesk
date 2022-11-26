@@ -1,0 +1,23 @@
+{
+	"contentrating" : "Everyone",
+	"description" : "Wind and Temperature animation from:\nhttps://www.facebook.com/EarthWindMap",
+	"file" : "index.html",
+	"general" : 
+	{
+		"properties" : 
+		{
+			"schemecolor" : 
+			{
+				"order" : 0,
+				"text" : "ui_browse_properties_scheme_color",
+				"type" : "color",
+				"value" : "0 0 0"
+			}
+		}
+	},
+	"preview" : "preview.jpg",
+	"tags" : [ "Technology" ],
+	"title" : "New Zealand Aligned Wind and Temp Globe",
+	"type" : "web",
+	"visibility" : "friends"
+}

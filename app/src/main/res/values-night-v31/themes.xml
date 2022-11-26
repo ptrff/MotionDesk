@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.LwU" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/ocra</item>
+        <item name="colorPrimaryVariant">@color/special_grey</item>
+        <item name="colorOnPrimary">@color/background</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/special_grey</item>
+        <item name="colorSecondaryVariant">@color/easy_red</item>
+        <item name="colorOnSecondary">@color/ocra</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- Splash screen settings -->
+        <item name="android:windowSplashScreenBackground">@color/splashscreen_background_dark</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/logo_splash_anim_dark</item>
+    </style>
+</resources>
