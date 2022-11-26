@@ -81,8 +81,6 @@ public class LWUService extends WallpaperService {
                 return;
             }
 
-            // To save battery, when we're not visible we want the WebView to stop processing,
-            // so we use the loadUrl mechanism to call some JavaScript to tell it to pause.
             if (visible) {
                 //myWebView.loadUrl("javascript:resumeWallpaper()");
             } else {
