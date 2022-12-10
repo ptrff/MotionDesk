@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="rounded_outline_button">45dp</dimen>
+    <dimen name="rounded_drag_view">90dp</dimen>
+</resources>

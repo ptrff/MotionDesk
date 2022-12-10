@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:enterFadeDuration="@android:integer/config_shortAnimTime"
+    android:exitFadeDuration="@android:integer/config_shortAnimTime">
+
+    <item android:state_checked="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+            <stroke android:color="@color/background" android:width="2dp"/>
+            <corners android:radius="@dimen/rounded_outline_button"/>
+        </shape>
+    </item>
+    <item android:state_checked="true">
+        <shape android:shape="rectangle">
+            <stroke android:color="@color/ocra" android:width="2dp"/>
+            <corners android:radius="@dimen/rounded_outline_button"/>
+        </shape>
+    </item>
+</selector>

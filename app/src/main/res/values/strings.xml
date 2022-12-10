@@ -4,4 +4,10 @@
     <string name="title_lib">Библиотека</string>
     <string name="title_browse">Поиск</string>
     <string name="title_profile">Профиль</string>
+    <string name="add_wallpapers">Создать</string>
+    <string name="new_wallpaper_type">Выберите тип обоев:</string>
+    <string name="scene_2d">2D Сцена</string>
+    <string name="scene_3d">3D Сцена</string>
+    <string name="web_wallpapers">Web обои</string>
+    <string name="gif_pic_wallpapers">GIF/Картинка</string>
 </resources>

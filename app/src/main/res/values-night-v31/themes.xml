@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.LwU" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.LwU" parent="Theme.MaterialComponents.DayNight">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/ocra</item>
         <item name="colorPrimaryVariant">@color/special_grey</item>
@@ -15,5 +15,24 @@
         <!-- Splash screen settings -->
         <item name="android:windowSplashScreenBackground">@color/splashscreen_background_dark</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/logo_splash_anim_dark</item>
+
+        <item name="bottomSheetDialogTheme">@style/RoundedBottomSheetDialog</item>
     </style>
+
+    <style name="RoundedBottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomRoundedBottomSheetDialog</item>
+    </style>
+
+    <style name="CustomRoundedBottomSheetDialog" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="shapeAppearanceOverlay">@style/CustomShapeAppearanceBottomSheetDialog</item>
+    </style>
+
+    <style name="CustomShapeAppearanceBottomSheetDialog" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
 </resources>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/all_dialog"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:visibility="visible"
+    app:behavior_hideable="true">
+
+    <View
+        android:layout_width="20dp"
+        android:layout_height="2dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/rounded_drag_view" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="15dp"
+        android:gravity="center"
+        android:text="@string/new_wallpaper_type"
+        android:textColor="?android:colorForeground"
+        android:textSize="15sp"
+        android:visibility="gone" />
+
+    <EditText
+        android:id="@+id/presonname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginBottom="15dp"
+        android:ems="10"
+        android:gravity="center"
+        android:hint="нейм"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:id="@+id/personnum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginBottom="15dp"
+        android:ems="10"
+        android:gravity="center"
+        android:hint="намбер"
+        android:inputType="number" />
+
+    <RadioGroup
+        android:id="@+id/toggleButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="25dp"
+        android:paddingEnd="25dp"
+        android:visibility="gone"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <RadioButton
+            android:id="@+id/button_scene_2d"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/rounded_outline_button"
+            android:button="@android:color/transparent"
+            android:gravity="center"
+            android:text="@string/scene_2d" />
+
+        <RadioButton
+            android:id="@+id/button_scene_3d"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/rounded_outline_button"
+            android:button="@android:color/transparent"
+            android:gravity="center"
+            android:text="@string/scene_3d"
+            app:icon="@drawable/ic_3d_cube" />
+
+        <RadioButton
+            android:id="@+id/button_web"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/rounded_outline_button"
+            android:button="@android:color/transparent"
+            android:gravity="center"
+            android:text="@string/web_wallpapers"
+            app:icon="@drawable/ic_code" />
+
+        <RadioButton
+            android:id="@+id/button_gif"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_outline_button"
+            android:button="@android:color/transparent"
+            android:gravity="center"
+            android:text="@string/gif_pic_wallpapers"
+            app:icon="@drawable/ic_image" />
+
+    </RadioGroup>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/button_next_step"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/rounded_button"
+        android:text="Добавить" />
+
+    <!--
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_outline_button"
+            android:text="" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_outline_button"
+            android:text="@string/scene_3d" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_outline_button"
+            android:text="@string/web_wallpapers" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_outline_button"
+            android:text="@string/gif_pic_wallpapers" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/rounded_outline_button"
+        android:text="@string/gif_pic_wallpapers" />-->
+
+</LinearLayout>
