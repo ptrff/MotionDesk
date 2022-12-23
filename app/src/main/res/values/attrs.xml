@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="foregroundBlackWhite" format="reference" />
+    <attr name="backgroundBlackWhite" format="reference" />
+    <attr name="backgroundDarkLight" format="reference" />
+    <attr name="actionBarColor" format="reference" />
+    <attr name="bottomNavBarChecked" format="reference" />
+    <attr name="bottomNavBarNotChecked" format="reference" />
+</resources>

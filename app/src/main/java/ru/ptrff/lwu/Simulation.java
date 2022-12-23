@@ -87,7 +87,6 @@ public class Simulation {
         simTime += timestep;
         deltaTime = timestep;
         //System.out.println("Updating   t=" + realTime + "      st=" + simTime);
-        System.out.println(Gdx.graphics.getFramesPerSecond());
         if(Gdx.graphics.getFramesPerSecond()<20){
             particles.clear();
             realTime=0;

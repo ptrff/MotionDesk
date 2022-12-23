@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_graph"
+    app:startDestination="@id/libFragment">
+
+    <fragment
+        android:id="@+id/libFragment"
+        android:name="ru.ptrff.lwu.view.LibFragment"
+        android:label="fragment_lib"
+        tools:layout="@layout/fragment_lib" >
+        <action
+            android:id="@+id/action_libFragment_to_browseFragment"
+            app:destination="@id/browseFragment" />
+        <action
+            android:id="@+id/action_libFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_libFragment_to_wallpaperInfo"
+            app:destination="@id/wallpaperInfo" />
+    </fragment>
+    <fragment
+        android:id="@+id/browseFragment"
+        android:name="ru.ptrff.lwu.view.BrowseFragment"
+        android:label="fragment_browse"
+        tools:layout="@layout/fragment_browse" >
+        <action
+            android:id="@+id/action_browseFragment_to_libFragment"
+            app:destination="@id/libFragment" />
+        <action
+            android:id="@+id/action_browseFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_browseFragment_to_wallpaperInfo"
+            app:destination="@id/wallpaperInfo" />
+    </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="ru.ptrff.lwu.view.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_browseFragment"
+            app:destination="@id/browseFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_libFragment"
+            app:destination="@id/libFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_wallpaperInfo"
+            app:destination="@id/wallpaperInfo" />
+    </fragment>
+    <activity
+        android:id="@+id/wallpaperInfo"
+        android:name="ru.ptrff.lwu.WallpaperPreview"
+        android:label="activity_wallpaper_info"
+        tools:layout="@layout/activity_wallpaper_preview" />
+</navigation>

@@ -2,36 +2,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:orientation="vertical">
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".view.MainActivity">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.25dp"
-        android:alpha="0.3"
-        android:background="@color/special_grey"/>
 
     <FrameLayout
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1">
-
-    </FrameLayout>
+        android:layout_weight="1"
+        android:background="?backgroundBlackWhite" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="?android:attr/windowBackground"
+        app:backgroundTint="?backgroundBlackWhite"
+        app:elevation="0dp"
+        app:itemIconTint="@color/bottom_navigation_item_color"
         app:itemRippleColor="@null"
+        app:itemTextColor="@color/bottom_navigation_item_color"
         app:labelVisibilityMode="selected"
-        app:menu="@menu/bottom_nav_menu">
-
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
+        app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>

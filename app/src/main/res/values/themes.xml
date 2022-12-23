@@ -15,6 +15,10 @@
 
         <item name="android:text">#FF000000</item>
         <item name="bottomSheetDialogTheme">@style/RoundedBottomSheetDialog</item>
+        <item name="foregroundBlackWhite">@color/black</item>
+        <item name="backgroundBlackWhite">@color/white</item>
+        <item name="bottomNavBarChecked">@color/black</item>
+        <item name="bottomNavBarNotChecked">@color/grey</item>
     </style>
 
     <style name="RoundedBottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
