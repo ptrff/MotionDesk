@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingRight="0dp"
+    android:orientation="vertical">
+    <TextView
+        android:id="@+id/section_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:text="Популярное в категории anime >"
+        android:textColor="?colorAccent"
+        android:textSize="16sp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ru.ptrff.motiondesk.OverscrollLayout
+            android:id="@+id/overscroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            app:animDuration="400"
+            app:damping="0.5"
+            app:indicatorDamping="0.3"
+            app:overScrollSize="400"
+            app:overScrollStateChangeSize="200">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="true"
+                android:overScrollMode="never" />
+
+        </ru.ptrff.motiondesk.OverscrollLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:background="@drawable/bg_to_transparent_gradient"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:rotationY="180"
+                android:background="@drawable/bg_to_transparent_gradient"/>
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+</LinearLayout>

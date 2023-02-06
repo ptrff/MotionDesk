@@ -6,4 +6,20 @@
     <attr name="actionBarColor" format="reference" />
     <attr name="bottomNavBarChecked" format="reference" />
     <attr name="bottomNavBarNotChecked" format="reference" />
+
+    <declare-styleable name="ShimmerView">
+        <attr name="shimmerColor" format="color" />
+        <attr name="shimmerColorBackground" format="color" />
+        <attr name="shimmerAnimationDuration" format="integer" />
+        <attr name="shimmerRadius" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="OverscrollLayout">
+        <attr name="canOverScroll" format="boolean" />
+        <attr name="animDuration" format="integer" />
+        <attr name="overScrollSize" format="integer" />
+        <attr name="overScrollStateChangeSize" format="integer" />
+        <attr name="damping" format="float" />
+        <attr name="indicatorDamping" format="float" />
+    </declare-styleable>
 </resources>

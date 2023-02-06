@@ -179,7 +179,7 @@
                     android:layout_gravity="center"
                     android:nestedScrollingEnabled="false"
 
-                    android:paddingRight="5dp" />
+                    android:paddingRight="8dp" />
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

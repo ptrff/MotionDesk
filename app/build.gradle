@@ -2,12 +2,12 @@ plugins {
     id 'com.android.application'
 }
 android {
-    namespace 'ru.ptrff.lwu'
+    namespace 'ru.ptrff.motiondesk'
     compileSdk 32
 
     defaultConfig {
-        applicationId "ru.ptrff.lwu"
-        minSdk 21
+        applicationId "ru.ptrff.motiondesk"
+        minSdk 23
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -30,7 +30,8 @@ android {
     }
     buildscript {
         repositories {
-            maven { url 'https://jitpack.io' }
+            maven { url "https://jitpack.io" }
+            mavenCentral()
         }
     }
     sourceSets {
@@ -38,8 +39,6 @@ android {
             jniLibs.srcDirs = ["libs"]
         }
     }
-
-
 }
 ext {
     gdxVersion = '1.11.0'
@@ -88,9 +87,15 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.navigation:navigation-fragment:2.5.3'
     implementation 'androidx.navigation:navigation-ui:2.5.3'
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
 
     api "com.badlogicgames.gdx:gdx-backend-android:1.11.0"
     api "com.badlogicgames.gdx:gdx:$gdxVersion"
+
+    implementation 'com.crashinvaders.vfx:gdx-vfx-core:0.5.1'
+    implementation 'com.crashinvaders.vfx:gdx-vfx-effects:0.5.1'
+
+    implementation 'com.github.skydoves:expandablelayout:1.0.7'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'com.google.code.gson:gson:2.10'
 
@@ -99,4 +104,6 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+
+    implementation 'com.squareup.picasso:picasso:2.8'
 }

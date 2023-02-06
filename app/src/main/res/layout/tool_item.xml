@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/all_item"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="3dp">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardBackgroundColor="@color/special_grey"
+        app:elevation="0dp"
+        app:cardCornerRadius="@dimen/card_corners">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp">
+
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:tint="?foregroundBlackWhite"
+                tools:src="@drawable/ic_edit" />
+
+            <TextView
+                android:id="@+id/label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?foregroundBlackWhite"
+                android:textSize="8sp"
+                tools:text="Edit" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

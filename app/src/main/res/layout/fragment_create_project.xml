@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:theme="@style/Theme.MotionDesk"
+    tools:context=".view.CreateProjectFragment">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@drawable/rounded_bottom_dialog">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="25dp"
+                    android:layout_height="3dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/rounded_drag_view" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/choose_project_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="15dp"
+                    android:gravity="center"
+                    android:text="@string/new_wallpaper_type"
+                    android:textColor="?foregroundBlackWhite"
+                    android:textSize="15sp" />
+
+                <RelativeLayout
+                    android:id="@+id/parts_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/first_part"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:alpha="1"
+                        android:orientation="vertical">
+
+                        <RadioButton
+                            android:id="@+id/type_scene_2d"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginStart="15dp"
+                            android:layout_marginEnd="15dp"
+                            android:layout_marginBottom="5dp"
+                            android:background="@drawable/rounded_outline_button"
+                            android:button="@null"
+                            android:drawableLeft="@drawable/selector_2d_square"
+                            android:drawableRight="@drawable/transparent"
+                            android:drawablePadding="5dp"
+                            android:gravity="center"
+                            android:paddingLeft="15dp"
+                            android:paddingRight="15dp"
+                            android:text="@string/scene_2d"
+                            android:textColor="@color/bottom_navigation_item_color"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="15dp"
+                            android:layout_marginEnd="15dp"
+                            android:layout_marginBottom="5dp"
+                            android:orientation="horizontal">
+
+                            <RadioButton
+                                android:id="@+id/type_web"
+                                android:layout_width="match_parent"
+                                android:layout_height="50dp"
+                                android:layout_marginEnd="2.5dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/rounded_outline_button"
+                                android:button="@null"
+                                android:drawableLeft="@drawable/selector_web"
+                                android:drawablePadding="5dp"
+                                android:gravity="center"
+                                android:paddingLeft="15dp"
+                                android:paddingRight="15dp"
+                                android:text="@string/web_wallpapers"
+                                android:textColor="@color/bottom_navigation_item_color"
+                                android:textStyle="bold" />
+
+                            <RadioButton
+                                android:id="@+id/type_gif"
+                                android:layout_width="match_parent"
+                                android:layout_height="50dp"
+                                android:layout_marginStart="2.5dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/rounded_outline_button"
+                                android:button="@null"
+                                android:drawableLeft="@drawable/selector_image"
+                                android:drawablePadding="5dp"
+                                android:gravity="center"
+                                android:paddingLeft="15dp"
+                                android:paddingRight="15dp"
+                                android:text="@string/gif_pic_wallpapers"
+                                android:textColor="@color/bottom_navigation_item_color"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/second_part"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:alpha="0"
+                        android:orientation="vertical"
+                        android:visibility="invisible">
+
+                        <EditText
+                            android:id="@+id/name_edit"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginStart="15dp"
+                            android:layout_marginEnd="15dp"
+                            android:layout_marginBottom="5dp"
+                            android:background="@drawable/rounded_outline_button"
+                            android:drawableLeft="@drawable/ic_edit"
+                            android:drawableTint="?bottomNavBarNotChecked"
+                            android:drawableRight="@drawable/transparent"
+                            android:drawablePadding="5dp"
+                            android:gravity="center"
+                            android:hint="Введите название"
+                            android:inputType="textPersonName"
+                            android:paddingLeft="15dp"
+                            android:paddingRight="15dp"
+                            android:textColor="?colorAccent"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:layout_marginBottom="5dp"
+                            android:text="Придумайте хорошее название для ваших обоев. Оно может отображать персонажей/стиль/произведение и т.д." />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/third_part"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:alpha="0"
+                        android:orientation="vertical"
+                        android:visibility="invisible">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <EditText
+                                android:id="@+id/width"
+                                android:layout_width="match_parent"
+                                android:layout_height="50dp"
+                                android:layout_marginStart="15dp"
+                                android:layout_marginEnd="7.5dp"
+                                android:layout_marginBottom="5dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/rounded_outline_button"
+                                android:drawableLeft="@drawable/ic_width"
+                                android:drawablePadding="5dp"
+                                android:drawableTint="?bottomNavBarNotChecked"
+                                android:gravity="center"
+                                android:hint="Ширина"
+                                android:inputType="number"
+                                android:paddingLeft="15dp"
+                                android:paddingRight="15dp"
+                                android:textColor="?colorAccent"
+                                android:textSize="16sp" />
+
+                            <EditText
+                                android:id="@+id/height"
+                                android:layout_width="match_parent"
+                                android:layout_height="50dp"
+                                android:layout_marginStart="7.5dp"
+                                android:layout_marginEnd="15dp"
+                                android:layout_marginBottom="5dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/rounded_outline_button"
+                                android:drawableLeft="@drawable/ic_height"
+                                android:drawablePadding="5dp"
+                                android:drawableTint="?bottomNavBarNotChecked"
+                                android:gravity="center"
+                                android:hint="Высота"
+                                android:inputType="number"
+                                android:paddingLeft="15dp"
+                                android:paddingRight="15dp"
+                                android:textColor="?colorAccent"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:layout_marginBottom="5dp"
+                            android:text="Оставьте поля пустыми, чтобы выбрать разрешение вашего экрана" />
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/buttons_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/back_button"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/rounded_outline_button"
+                        android:backgroundTint="?colorSecondary"
+                        android:src="@drawable/ic_close"
+                        app:tint="?colorSecondary" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp">
+
+                        <ImageView
+                            android:id="@+id/short_type"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:alpha="0"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            app:tint="?colorPrimaryVariant" />
+
+                        <TextView
+                            android:id="@+id/short_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:alpha="0"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:maxLines="3"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp"
+                            android:textColor="?colorPrimaryVariant"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/short_resolution"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:alpha="0"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:maxLines="3"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp"
+                            android:textColor="?colorPrimaryVariant"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/next_button"
+                        android:layout_width="50dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/rounded_outline_button"
+                        android:backgroundTint="?bottomNavBarNotChecked"
+                        android:src="@drawable/ic_forward"
+                        app:tint="?bottomNavBarNotChecked" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</FrameLayout>

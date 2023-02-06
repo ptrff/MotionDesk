@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true">
+    <vector
+        android:width="24dp"
+        android:height="24dp"
+        android:tint="?colorAccent"
+        android:viewportWidth="24"
+        android:viewportHeight="24">
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M17,22L17,20L20,20L20,17L22,17L22,20.5C22,20.89 21.84,21.24 21.54,21.54C21.24,21.84 20.89,22 20.5,22L17,22M7,22L3.5,22C3.11,22 2.76,21.84 2.46,21.54C2.16,21.24 2,20.89 2,20.5L2,17L4,17L4,20L7,20L7,22M17,2L20.5,2C20.89,2 21.24,2.16 21.54,2.46C21.84,2.76 22,3.11 22,3.5L22,7L20,7L20,4L17,4L17,2M7,2L7,4L4,4L4,7L2,7L2,3.5C2,3.11 2.16,2.76 2.46,2.46C2.76,2.16 3.11,2 3.5,2L7,2"/>
+        <path
+            android:pathData="M8.11,8.11h7.834v7.835h-7.834z"
+            android:strokeLineJoin="round"
+            android:strokeWidth="2"
+            android:fillColor="#00000000"
+            android:fillType="nonZero"
+            android:strokeColor="#000000"
+            android:strokeLineCap="round"/>
+    </vector></item>
+    <item android:state_checked="false">
+        <vector
+            android:width="24dp"
+            android:height="24dp"
+            android:tint="?bottomNavBarNotChecked"
+            android:viewportWidth="24"
+            android:viewportHeight="24">
+            <path
+                android:fillColor="#FF000000"
+                android:pathData="M17,22L17,20L20,20L20,17L22,17L22,20.5C22,20.89 21.84,21.24 21.54,21.54C21.24,21.84 20.89,22 20.5,22L17,22M7,22L3.5,22C3.11,22 2.76,21.84 2.46,21.54C2.16,21.24 2,20.89 2,20.5L2,17L4,17L4,20L7,20L7,22M17,2L20.5,2C20.89,2 21.24,2.16 21.54,2.46C21.84,2.76 22,3.11 22,3.5L22,7L20,7L20,4L17,4L17,2M7,2L7,4L4,4L4,7L2,7L2,3.5C2,3.11 2.16,2.76 2.46,2.46C2.76,2.16 3.11,2 3.5,2L7,2"/>
+            <path
+                android:pathData="M8.11,8.11h7.834v7.835h-7.834z"
+                android:strokeLineJoin="round"
+                android:strokeWidth="2"
+                android:fillColor="#00000000"
+                android:fillType="nonZero"
+                android:strokeColor="#000000"
+                android:strokeLineCap="round"/>
+        </vector></item>
+</selector>

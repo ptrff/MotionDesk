@@ -3,14 +3,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:visibility="visible"
     tools:context=".WallpaperPreview">
 
-    <FrameLayout
-        android:id="@+id/preview"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?backgroundBlackWhite" />
+        android:layout_height="wrap_content"
+        app:elevation="0dp"
+        android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?backgroundBlackWhite"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:layout_scrollFlags="enterAlways" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="50dp"
+            android:background="?backgroundBlackWhite" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/floatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:alpha="0.5"
+            android:layout_marginBottom="15dp"
+            android:layout_marginEnd="15dp"
+            android:backgroundTint="?colorSecondary"
+            android:src="@drawable/ic_parameters" />
+
+    </RelativeLayout>
 
 </LinearLayout>

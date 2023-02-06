@@ -1,18 +1,18 @@
 <resources>
-    <string name="app_name">LwU</string>
-    <string name="app_full_name">LwU | Live Wallpaper You</string>
+    <string name="app_name">MotionDesk</string>
+    <string name="app_full_name">MotionDesk - Live Wallpapers</string>
     <string name="title_lib">Библиотека</string>
     <string name="title_browse">Поиск</string>
     <string name="title_profile">Профиль</string>
     <string name="add_wallpapers">Создать</string>
-    <string name="new_wallpaper_type">Выберите тип обоев:</string>
+    <string name="new_wallpaper_type">Новый проект:</string>
     <string name="scene_2d">2D Сцена</string>
     <string name="scene_3d">3D Сцена</string>
     <string name="web_wallpapers">Web обои</string>
-    <string name="gif_pic_wallpapers">GIF/Картинка</string>
+    <string name="gif_pic_wallpapers">GIF/Фото</string>
     <string name="search_wallpapers">Поиск обоев</string>
     <string name="edit_profile">Редактировать профиль</string>
     <string name="settings">Настройки</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="apply">Применить</string>
+    <string name="stop">Остановить</string>
 </resources>

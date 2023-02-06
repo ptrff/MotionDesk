@@ -3,18 +3,21 @@
     <color name="background">#23162A</color>
     <color name="special_grey">#524C68</color>
     <color name="easy_red">#874F68</color>
-    <color name="ocra">#E6C69F</color>
-    <color name="ocra_dark">#BCA080</color>
+    <color name="ocra">#f8ca9d</color>
+    <color name="ocra_dark">#FFB703</color>
+    <color name="orange_darkest">#FB8500</color>
+    <color name="blue">#8ECAE6</color>
+    <color name="blue_dark">#219EBC</color>
+    <color name="blue_darkest">#023047</color>
     <color name="grey">#676767</color>
     <color name="red">#A31E15</color>
     <color name="black">#121212</color>
     <color name="true_black">#000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="splashscreen_background">#FFFFFFFF</color>
-    <color name="splashscreen_background_dark">#121212</color>
 
     <color name="darker_blue_grey">#22223B</color>
     <color name="blue_grey">#4A4E69</color>
     <color name="unsaturated_dark_skintone">#9A8C98</color>
     <color name="skintone">#C9ADA7</color>
+    <color name="darkest_grey">#202020</color>
 </resources>

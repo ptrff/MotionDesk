@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="rounded_outline_button">45dp</dimen>
-    <dimen name="rounded_drag_view">90dp</dimen>
+    <dimen name="rounded_outline_button_corners">15dp</dimen>
+    <dimen name="rounded_drag_view_corners">90dp</dimen>
+    <dimen name="card_corners">15dp</dimen>
+    <dimen name="editor_app_bar_size">30dp</dimen>
 </resources>

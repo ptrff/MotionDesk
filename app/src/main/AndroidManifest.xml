@@ -22,18 +22,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.LwU"
+        android:theme="@style/Theme.MotionDesk"
         tools:targetApi="31">
-        <activity
-            android:name=".WallpaperPreview"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".view.MainActivity" />
-        </activity>
         <activity
             android:name=".view.MainActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
@@ -44,9 +34,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+        </activity>
+
+        <activity
+            android:name=".WallpaperPreview"
+            android:exported="false">
             <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".view.MainActivity" />
+        </activity>
+
+        <activity
+            android:name=".WallpaperEditor"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="true">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".view.MainActivity" />
         </activity>
 
         <service
