@@ -2,19 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/ThemeOverlay.AppCompat.DayNight"
-    android:orientation="vertical"
-    android:gravity="center"
+    style="@style/Theme.MotionDesk"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="175dp"
+        android:layout_height="175dp"
         android:layout_marginTop="15dp"
         android:layout_marginBottom="15dp"
-        android:scaleType="center"
+        android:scaleType="fitCenter"
         tools:src="@drawable/ic_info" />
 
     <TextView
@@ -40,21 +40,53 @@
         android:textSize="14sp"
         tools:text="Alalala alalala description description description description a lot of lines a lot of lines a lot of lines a lot of lines a lot of lines a lot of lines a lot of lines ok just 3 lines..." />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/button"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginBottom="15dp"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp"
-        android:textAllCaps="false"
-        android:textSize="16sp"
-        android:textColor="?colorAccent"
-        android:background="@drawable/rounded_outline_button"
-        app:backgroundTint="?colorAccent"
-        app:cornerRadius="@dimen/card_corners"
-        tools:text="button action" />
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_outline_button"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:textAllCaps="false"
+            android:textColor="?colorAccent"
+            android:textSize="16sp"
+            app:backgroundTint="?colorAccent"
+            app:cornerRadius="@dimen/card_corners"
+            tools:text="button action" />
+
+        <Space
+            android:id="@+id/buttons_space"
+            android:visibility="gone"
+            android:layout_width="15dp"
+            android:layout_height="wrap_content" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:visibility="gone"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_outline_button"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:textAllCaps="false"
+            android:textColor="?colorAccent"
+            android:textSize="16sp"
+            app:backgroundTint="?colorAccent"
+            app:cornerRadius="@dimen/card_corners"
+            tools:text="button action" />
+
+    </LinearLayout>
+
 
 </LinearLayout>

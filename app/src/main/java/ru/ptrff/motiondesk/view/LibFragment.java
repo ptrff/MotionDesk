@@ -1,12 +1,10 @@
 package ru.ptrff.motiondesk.view;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.transition.Explode;
 import android.util.DisplayMetrics;
@@ -19,7 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -33,20 +30,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import ru.ptrff.motiondesk.Converter;
-import ru.ptrff.motiondesk.OnItemClickListener;
-import ru.ptrff.motiondesk.OnItemLongClickListener;
+import ru.ptrff.motiondesk.utils.Converter;
 import ru.ptrff.motiondesk.R;
-import ru.ptrff.motiondesk.WallpaperPreview;
 import ru.ptrff.motiondesk.data.WallpaperItem;
 import ru.ptrff.motiondesk.databinding.FragmentLibBinding;
 import ru.ptrff.motiondesk.adapters.WpprsAdapter;
-import ru.ptrff.motiondesk.databinding.StateViewBinding;
 import ru.ptrff.motiondesk.viewmodel.LibViewModel;
 
 

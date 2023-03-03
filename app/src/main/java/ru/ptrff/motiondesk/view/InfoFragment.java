@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
@@ -33,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 
 import ru.ptrff.motiondesk.R;
-import ru.ptrff.motiondesk.WallpaperEditor;
 import ru.ptrff.motiondesk.databinding.FragmentInfoBinding;
 
 public class InfoFragment extends BottomSheetDialogFragment {

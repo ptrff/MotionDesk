@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".WallpaperEditor">
+    tools:context=".view.WallpaperEditor">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,19 +16,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:elevation="0dp"
-            android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar">
+            android:theme="@style/Theme.MotionDesk">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar_title"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/editor_app_bar_size"
                 android:background="?backgroundBlackWhite"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:popupTheme="@style/Theme.MotionDesk"
                 app:layout_scrollFlags="enterAlways" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/toolbar_tools"
                 android:layout_width="match_parent"
+                android:background="?backgroundBlackWhite"
                 android:layout_height="50dp"
                 android:orientation="horizontal"/>
 
@@ -83,30 +84,12 @@
                 android:textColor="?foregroundBlackWhite"
                 android:text="zagalovk"/>
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:alpha="1"
-                android:layout_marginBottom="15dp"
-                android:layout_marginEnd="15dp"
-                android:backgroundTint="?colorSecondary"
-                android:src="@drawable/ic_parameters" />
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:alpha="1"
-                android:layout_marginBottom="15dp"
-                android:layout_marginEnd="15dp"
-                android:backgroundTint="?colorSecondary"
-                android:src="@drawable/ic_parameters" />
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:alpha="1"
-                android:layout_marginBottom="15dp"
-                android:layout_marginEnd="15dp"
-                android:backgroundTint="?colorSecondary"
-                android:src="@drawable/ic_parameters" />
+            <FrameLayout
+                android:id="@+id/content"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="?backgroundBlackWhite"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
         </LinearLayout>
 

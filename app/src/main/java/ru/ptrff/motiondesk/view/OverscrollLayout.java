@@ -1,4 +1,4 @@
-package ru.ptrff.motiondesk;
+package ru.ptrff.motiondesk.view;
 
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -24,6 +24,8 @@ import android.view.ViewConfiguration;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import ru.ptrff.motiondesk.R;
 
 public class OverscrollLayout extends RelativeLayout {
 

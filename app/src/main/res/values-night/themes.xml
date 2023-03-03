@@ -12,6 +12,8 @@
         <item name="colorOnSecondary">@color/background</item>
         <!-- StatusBar color. -->
         <item name="android:statusBarColor">@color/black</item>
+        <item name="android:windowLightStatusBar">false</item>
+
         <!-- SplashScreen settings -->
         <item name="android:windowSplashScreenBackground" tools:targetApi="s">@color/black</item>
         <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="s">@drawable/logo_splash_animation</item>
@@ -21,7 +23,7 @@
         <item name="backgroundBlackWhite">@color/black</item>
         <item name="backgroundDarkLight">@color/darker_blue_grey</item>
         <item name="bottomNavBarChecked">@color/ocra</item>
-        <item name="bottomNavBarNotChecked">@color/grey</item>
+        <item name="bottomNavBarNotChecked">@color/gray</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <item name="shimmerColor">@color/ocra</item>
         <item name="shimmerColorBackground">@color/darkest_grey</item>

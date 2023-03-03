@@ -1,4 +1,4 @@
-package ru.ptrff.motiondesk;
+package ru.ptrff.motiondesk.view;
 
 import ru.ptrff.motiondesk.data.WallpaperItem;
 

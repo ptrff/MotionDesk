@@ -10,6 +10,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -79,20 +80,22 @@
                             android:orientation="horizontal">
 
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
                                 android:src="@drawable/ic_label"
+                                android:scaleType="centerCrop"
                                 app:tint="?foregroundBlackWhite" />
 
                             <TextView
                                 android:id="@+id/name"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:ellipsize="end"
                                 android:layout_marginLeft="15dp"
-                                android:maxLines="5"
+                                android:translationX="-1dp"
+                                android:ellipsize="end"
+                                android:maxLines="4"
                                 android:text="A little name"
-                                android:textColor="?foregroundBlackWhite"/>
+                                android:textColor="?foregroundBlackWhite" />
                         </LinearLayout>
 
                         <Space
@@ -107,8 +110,8 @@
                             android:orientation="horizontal">
 
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
                                 android:layout_weight="0"
                                 android:src="@drawable/ic_person"
                                 app:tint="?colorAccent" />
@@ -119,7 +122,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="15dp"
                                 android:text="i_petroff"
-                                android:textColor="?colorAccent" />
+                                android:textColor="?colorAccent"
+                                android:textSize="12sp" />
                         </LinearLayout>
 
                         <Space
@@ -134,8 +138,8 @@
                             android:orientation="horizontal">
 
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
                                 android:layout_weight="0"
                                 android:src="@drawable/ic_star"
                                 app:tint="?colorAccent" />
@@ -146,7 +150,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="15dp"
                                 android:text="8.5/10"
-                                android:textColor="?colorAccent" />
+                                android:textColor="?colorAccent"
+                                android:textSize="12sp" />
                         </LinearLayout>
 
                         <Space
@@ -161,8 +166,62 @@
                             android:orientation="horizontal">
 
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_weight="0"
+                                android:src="@drawable/ic_image_size"
+                                app:tint="?colorAccent" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="15dp"
+                                android:text="1920 x 1080"
+                                android:textColor="?colorAccent"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <Space
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_weight="0"
+                                android:src="@drawable/ic_memory"
+                                app:tint="?colorAccent" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="15dp"
+                                android:text="8 Мб"
+                                android:textColor="?colorAccent"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <Space
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
                                 android:layout_weight="0"
                                 android:src="@drawable/ic_lock_person"
                                 app:tint="?colorAccent" />
@@ -173,7 +232,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="15dp"
                                 android:text="18+"
-                                android:textColor="?colorAccent" />
+                                android:textColor="?colorAccent"
+                                android:textSize="12sp" />
                         </LinearLayout>
 
                         <Space
@@ -189,8 +249,8 @@
                             android:orientation="horizontal">
 
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
                                 android:layout_weight="0"
                                 android:src="@drawable/ic_download"
                                 app:tint="?colorAccent" />
@@ -201,7 +261,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="15dp"
                                 android:text="495k."
-                                android:textColor="?colorAccent" />
+                                android:textColor="?colorAccent"
+                                android:textSize="12sp" />
                         </LinearLayout>
 
                     </LinearLayout>

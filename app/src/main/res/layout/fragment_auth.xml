@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:padding="15dp"
+    tools:context=".view.AuthFragment">
+
+    <LinearLayout
+        android:id="@+id/root_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/maz_kot2" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/welcome_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Добро пожаловать в"
+                android:textColor="@color/gray"
+                android:textSize="25sp"
+                android:translationY="8dp" />
+
+            <TextView
+                android:id="@+id/appname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="MotionDesk!"
+                android:textColor="?foregroundBlackWhite"
+                android:textSize="50sp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/nickname_input_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                app:boxBackgroundMode="none"
+                app:hintAnimationEnabled="false"
+                app:hintEnabled="false"
+                app:startIconDrawable="@drawable/ic_person"
+                app:startIconTint="?bottomNavBarNotChecked">
+
+                <EditText
+                    android:id="@+id/nickname"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/rounded_outline_button"
+                    android:hint="Имя пользователя / Е-mail"
+                    android:imeOptions="actionNext"
+                    android:inputType="textPersonName"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:paddingLeft="15dp"
+                    android:paddingTop="0dp"
+                    android:paddingRight="15dp"
+                    android:paddingBottom="0dp"
+                    android:textColor="?bottomNavBarNotChecked" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/password_input_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="5dp"
+                app:boxBackgroundMode="none"
+                app:hintAnimationEnabled="false"
+                app:hintEnabled="false"
+                app:passwordToggleDrawable="@drawable/ic_eye"
+                app:passwordToggleEnabled="true"
+                app:passwordToggleTint="?bottomNavBarNotChecked"
+                app:startIconDrawable="@drawable/ic_password"
+                app:startIconTint="?bottomNavBarNotChecked">
+
+                <EditText
+                    android:id="@+id/password"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/rounded_outline_button"
+                    android:hint="Пароль"
+                    android:imeOptions="actionDone"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:paddingTop="0dp"
+                    android:paddingBottom="0dp"
+                    android:textColor="?bottomNavBarNotChecked" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/text_create"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_shape"
+                    android:backgroundTint="?colorAccent"
+                    android:gravity="center"
+                    android:paddingStart="15dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="15dp"
+                    android:paddingBottom="5dp"
+                    android:text="Нет аккаунта? "
+                    android:textStyle="bold"
+                    android:textColor="?backgroundBlackWhite"
+                    android:textSize="16sp" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/login"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_button"
+                    android:gravity="center"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:stateListAnimator="@null"
+                    android:text="Регистрация / Вход"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/text_recover"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_weight="0"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/rounded_shape"
+                    android:backgroundTint="?colorSecondary"
+                    android:gravity="center"
+                    android:paddingStart="15dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="15dp"
+                    android:paddingBottom="5dp"
+                    android:text="Забыли\nпароль?"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

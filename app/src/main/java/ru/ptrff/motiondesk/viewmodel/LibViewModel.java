@@ -51,7 +51,7 @@ public class LibViewModel extends AndroidViewModel {
             while (pos+5>itemsList.size()) {
                 int r = new Random().nextInt(1);
                 itemsList.add(
-                        new WallpaperItem(itemsList.size()+1, "Название обоев",
+                        new WallpaperItem(itemsList.size()+1, "A little name \\nA little name \\nA little name \\nA little name \\nA little name sdhfjkshdfj skjdhfksjdhf skjhfkjsdh fhskjd fhksj djs",
                                 "i_petroff",
                                 "description",
                                 new Random().nextInt(100)/10f,

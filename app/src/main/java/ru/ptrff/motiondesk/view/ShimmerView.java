@@ -31,9 +31,15 @@ public class ShimmerView extends View {
     private int shimmerTranslateY;
     private final ShimmerAnimation shimmerAnimation;
     private static long globalTimer;
+    private boolean isCubic = false;
 
     public ShimmerView(Context context) {
         this(context, null);
+    }
+
+    public ShimmerView(Context context, boolean isCubic) {
+        this(context, null);
+        this.isCubic=isCubic;
     }
 
     public ShimmerView(Context context, AttributeSet attrs) {
@@ -62,7 +68,9 @@ public class ShimmerView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        int desiredHeight = widthMeasureSpec*3/2;
+        int desiredHeight;
+        if(isCubic) desiredHeight = widthMeasureSpec;
+        else desiredHeight = widthMeasureSpec*3/2;
 
         int newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(desiredHeight, MeasureSpec.EXACTLY);
 

@@ -1,4 +1,4 @@
-package ru.ptrff.motiondesk;
+package ru.ptrff.motiondesk.utils;
 
 import android.content.Context;
 

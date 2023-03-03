@@ -16,7 +16,7 @@ import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.data.ToolItem;
 import ru.ptrff.motiondesk.databinding.ToolItemBinding;
 
-public class ToolbarAdapter extends RecyclerView.Adapter<ToolbarAdapter.ImageViewHolder> {
+public class ToolbarAdapter extends RecyclerView.Adapter<ToolbarAdapter.ToolItemHolder> {
 
     private ToolItemBinding binding;
     private final List<ToolItem> tools;
@@ -29,15 +29,15 @@ public class ToolbarAdapter extends RecyclerView.Adapter<ToolbarAdapter.ImageVie
 
     @NonNull
     @Override
-    public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ToolItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         binding = ToolItemBinding.bind(LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.tool_item, parent, false));
 
-        return new ImageViewHolder(binding);
+        return new ToolItemHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ToolItemHolder holder, int position) {
         ToolItem tool = tools.get(position);
         bind(tool);
     }
@@ -52,12 +52,12 @@ public class ToolbarAdapter extends RecyclerView.Adapter<ToolbarAdapter.ImageVie
         return tools.size();
     }
 
-    public class ImageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ToolItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final ImageView icon;
         private final LinearLayout allItem;
         private final TextView label;
 
-        public ImageViewHolder(@NonNull ToolItemBinding binding) {
+        public ToolItemHolder(@NonNull ToolItemBinding binding) {
             super(binding.getRoot());
             icon = binding.icon;
             allItem = binding.allItem;

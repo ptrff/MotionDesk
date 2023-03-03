@@ -24,9 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ru.ptrff.motiondesk.OnItemClickListener;
 import ru.ptrff.motiondesk.R;
-import ru.ptrff.motiondesk.WallpaperPreview;
 import ru.ptrff.motiondesk.databinding.FragmentProfileBinding;
 import ru.ptrff.motiondesk.adapters.WpprsAdapter;
 import ru.ptrff.motiondesk.data.WallpaperItem;

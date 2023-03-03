@@ -1,4 +1,4 @@
-package ru.ptrff.motiondesk;
+package ru.ptrff.motiondesk.engine;
 
 import static java.lang.Math.PI;
 

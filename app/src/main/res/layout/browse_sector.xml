@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ru.ptrff.motiondesk.OverscrollLayout
+        <ru.ptrff.motiondesk.view.OverscrollLayout
             android:id="@+id/overscroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
                 android:nestedScrollingEnabled="true"
                 android:overScrollMode="never" />
 
-        </ru.ptrff.motiondesk.OverscrollLayout>
+        </ru.ptrff.motiondesk.view.OverscrollLayout>
 
 
         <LinearLayout

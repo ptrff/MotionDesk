@@ -6,6 +6,10 @@
         android:icon="@drawable/ic_done"
         android:title="@string/apply"
         app:showAsAction="always" />
-    <item android:title="@string/stop"/>
-    <item android:title="потом если чё" />
+    <item
+        android:id="@+id/pause"
+        android:title="@string/stop" />
+    <item
+        android:id="@+id/anythingelse"
+        android:title="потом если чё" />
 </menu>

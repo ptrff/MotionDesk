@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layer_root"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:paddingTop="15dp"
+    android:paddingRight="15dp"
+    android:paddingLeft="15dp"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="16sp"
+        android:textColor="?foregroundBlackWhite"
+        android:text="Название слоя"
+        />
+
+    <ImageView
+        android:id="@+id/visibility"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:layout_marginStart="15dp"
+        android:src="@drawable/ic_eye"/>
+
+    <ImageView
+        android:id="@+id/drag_handle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:layout_marginStart="15dp"
+        android:src="@drawable/ic_drag_handle"/>
+
+
+</LinearLayout>

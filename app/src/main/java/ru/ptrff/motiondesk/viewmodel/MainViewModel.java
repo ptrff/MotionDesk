@@ -8,14 +8,14 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import ru.ptrff.motiondesk.EditProfileFragment;
+import ru.ptrff.motiondesk.view.AuthFragment;
+import ru.ptrff.motiondesk.view.EditProfileFragment;
 import ru.ptrff.motiondesk.view.BrowseFragment;
 import ru.ptrff.motiondesk.view.LibFragment;
 import ru.ptrff.motiondesk.view.ProfileFragment;
 
 public class MainViewModel extends AndroidViewModel {
     private final MutableLiveData<Fragment> currentFragment = new MutableLiveData<>();
-    private final MutableLiveData<String> actionBarLabel = new MutableLiveData<>();
     private int previousFragmentId = 0;
     private int currentFragmentId = 0;
     private final LibFragment libFragment;
@@ -27,7 +27,6 @@ public class MainViewModel extends AndroidViewModel {
         libFragment = new LibFragment();
         browseFragment = new BrowseFragment();
         profileFragment = new ProfileFragment();
-        actionBarLabel.setValue("LwU");
         currentFragment.setValue(libFragment);
     }
 
@@ -46,7 +45,7 @@ public class MainViewModel extends AndroidViewModel {
                 fragment = new EditProfileFragment();
                 break;
             case 4:
-                fragment = new EditProfileFragment();
+                fragment = new AuthFragment();
                 break;
             default:
                 fragment=libFragment;
@@ -57,9 +56,6 @@ public class MainViewModel extends AndroidViewModel {
 
     public LiveData<Fragment> getCurrentFragment() {
         return currentFragment;
-    }
-    public LiveData<String> getActionBarLabel() {
-        return actionBarLabel;
     }
 
     public int getPreviousFragmentId() {

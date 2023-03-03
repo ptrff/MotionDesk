@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import ru.ptrff.motiondesk.OnItemClickListener;
-import ru.ptrff.motiondesk.OnItemLongClickListener;
+import ru.ptrff.motiondesk.view.OnItemClickListener;
+import ru.ptrff.motiondesk.view.OnItemLongClickListener;
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.databinding.ListItemBinding;
 import ru.ptrff.motiondesk.data.WallpaperItem;

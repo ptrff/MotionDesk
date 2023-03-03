@@ -8,11 +8,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.google.android.material.appbar.AppBarLayout;
 
-import ru.ptrff.motiondesk.Converter;
+import ru.ptrff.motiondesk.utils.Converter;
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.databinding.ActivityMainBinding;
 import ru.ptrff.motiondesk.viewmodel.MainViewModel;

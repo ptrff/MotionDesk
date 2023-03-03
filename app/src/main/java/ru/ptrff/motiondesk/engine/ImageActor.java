@@ -1,20 +1,29 @@
-package ru.ptrff.motiondesk;
+package ru.ptrff.motiondesk.engine;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.crashinvaders.vfx.VfxManager;
+import com.crashinvaders.vfx.effects.ChainVfxEffect;
+import com.crashinvaders.vfx.scene2d.VfxWidgetGroup;
+
+import okhttp3.Interceptor;
 
 public class ImageActor extends Actor {
 
+    private String name;
     private final TextureRegion region;
     private final Texture stroke;
     private boolean hasStroke;
+    private float zoomAmount = 6;
 
-    public ImageActor(TextureRegion region) {
+    public ImageActor(TextureRegion region, String name) {
         this.region = region;
+        this.name = name;
         hasStroke=false;
         setSize(region.getRegionWidth(), region.getRegionHeight());
         setBounds(region.getRegionX(), region.getRegionY(),
@@ -22,6 +31,10 @@ public class ImageActor extends Actor {
 
         stroke = generateStroke();
         stroke.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+    }
+
+    public String getName(){
+        return name;
     }
 
     public ImageActor(int width, int height, Color color) {
@@ -36,9 +49,14 @@ public class ImageActor extends Actor {
         setSize(width, height);
         setBounds(region.getRegionX(), region.getRegionY(),
                 region.getRegionWidth(), region.getRegionHeight());
-
         stroke = generateStroke();
         stroke.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+    }
+
+    public void setSize(int width, int height){
+        setWidth(width);
+        setHeight(height);
+        setBounds(getX(), getY(), width, height);
     }
 
     private Texture generateStroke(){
@@ -51,15 +69,22 @@ public class ImageActor extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
+
         if (hasStroke) {
 
             batch.draw(
                     stroke,
-                    getX() - 6, getY() - 6,
-                    getWidth() + 12, getHeight() + 12
+                    getX() - zoomAmount, getY() - zoomAmount,
+                    getWidth() + zoomAmount*2, getHeight() + zoomAmount*2
             );
         }
         batch.draw(region, getX(), getY(), getWidth(), getHeight());
+
+
+    }
+
+    public void setZoomAmount(float zoom){
+        zoomAmount=6*zoom;
     }
 
     public void addStroke() {

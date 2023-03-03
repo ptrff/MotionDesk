@@ -24,6 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MotionDesk"
         tools:targetApi="31">
+
         <activity
             android:name=".view.MainActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
@@ -33,11 +34,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
         <activity
-            android:name=".WallpaperPreview"
+            android:name=".view.WallpaperPreview"
             android:exported="false">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -45,7 +45,7 @@
         </activity>
 
         <activity
-            android:name=".WallpaperEditor"
+            android:name=".view.WallpaperEditor"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:exported="true">
             <meta-data
@@ -54,7 +54,8 @@
         </activity>
 
         <service
-            android:name=".LWUService"
+            android:name=".engine.WallpaperLibGdxService"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:enabled="true"
             android:exported="true"
             android:label="LwU | Live wallpaper You"

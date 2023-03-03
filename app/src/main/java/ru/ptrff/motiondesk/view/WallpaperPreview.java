@@ -1,8 +1,7 @@
-package ru.ptrff.motiondesk;
+package ru.ptrff.motiondesk.view;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.core.view.MenuProvider;
 import androidx.lifecycle.Lifecycle;
 
@@ -13,13 +12,15 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 
+import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.databinding.ActivityWallpaperPreviewBinding;
-import ru.ptrff.motiondesk.view.GameFragment;
-import ru.ptrff.motiondesk.view.ParametersFragment;
+import ru.ptrff.motiondesk.engine.EngineEventsListener;
+import ru.ptrff.motiondesk.engine.WallpaperLibGdxFragment;
+import ru.ptrff.motiondesk.engine.WallpaperEditorEngine;
+import ru.ptrff.motiondesk.engine.WallpaperLibGdxService;
 
 public class WallpaperPreview extends AppCompatActivity implements  AndroidFragmentApplication.Callbacks{
 
@@ -43,7 +44,19 @@ public class WallpaperPreview extends AppCompatActivity implements  AndroidFragm
 
         setupActionBarButtons();
 
-        GameFragment libgdxFragment = new GameFragment(150, 150);
+        WallpaperEditorEngine engine = new WallpaperEditorEngine(150, 150, false, new EngineEventsListener() {
+            @Override
+            public void onObjectSelected(String type, int index) {
+
+            }
+
+            @Override
+            public void onObjectNotSelected() {
+
+            }
+        });
+
+        WallpaperLibGdxFragment libgdxFragment = new WallpaperLibGdxFragment(engine);
 
         getSupportFragmentManager().beginTransaction().
                 add(R.id.preview, libgdxFragment).
@@ -78,7 +91,7 @@ public class WallpaperPreview extends AppCompatActivity implements  AndroidFragm
                 if(menuItem.getItemId()==R.id.apply) {
                     Intent intent = new Intent(
                             WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
-                    intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(WallpaperPreview.this, LWUService.class));
+                    intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(WallpaperPreview.this, WallpaperLibGdxService.class));
                     startActivity(intent);
                 }
                 return false;

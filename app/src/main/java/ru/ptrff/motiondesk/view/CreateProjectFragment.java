@@ -14,6 +14,7 @@ import android.transition.Explode;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,10 +31,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
-import ru.ptrff.motiondesk.AnimationExecutor;
 import ru.ptrff.motiondesk.R;
-import ru.ptrff.motiondesk.WallpaperEditor;
-import ru.ptrff.motiondesk.WallpaperPreview;
 import ru.ptrff.motiondesk.databinding.FragmentCreateProjectBinding;
 
 public class CreateProjectFragment extends BottomSheetDialogFragment {
@@ -273,6 +271,11 @@ public class CreateProjectFragment extends BottomSheetDialogFragment {
         binding.nextButton.setOnClickListener(view -> {
             if (!animating && nameWritten) animateToResolution();
         });
+
+        binding.nameEdit.setOnEditorActionListener((textView, i, keyEvent) -> {
+            if (!animating && nameWritten) animateToResolution();
+            return true;
+        });
     }
 
     private void animateToResolution() {
@@ -297,6 +300,7 @@ public class CreateProjectFragment extends BottomSheetDialogFragment {
             }).start();
         }).start();
 
+        binding.width.requestFocus();
 
         animateView(
                 secondPartHeight,
@@ -316,6 +320,8 @@ public class CreateProjectFragment extends BottomSheetDialogFragment {
     private void returnToSecond() {
         animating = true;
         binding.nextButton.setImageResource(R.drawable.ic_forward);
+
+        binding.nameEdit.requestFocus();
 
         binding.secondPart.setVisibility(View.VISIBLE);
         binding.thirdPart.animate().alpha(0).setDuration(250).withEndAction(() -> {
@@ -350,18 +356,25 @@ public class CreateProjectFragment extends BottomSheetDialogFragment {
         binding.width.addTextChangedListener(resTextWatcher);
 
         binding.nextButton.setOnClickListener(view -> {
-            if (!animating) {
-                Intent i = new Intent(getActivity(), WallpaperEditor.class);
-                i.putExtra("Name", name);
-                i.putExtra("Width", width);
-                i.putExtra("Height", height);
-                requireActivity().getWindow().setExitTransition(new Explode());
-                startActivity(i);
-
-                Toast.makeText(requireContext(), typeNum + " " + name + " " + "res", Toast.LENGTH_SHORT).show();
-                dismiss();
-            }
+            if (!animating) createProject();
         });
+
+        binding.height.setOnEditorActionListener((textView, i, keyEvent) -> {
+            if (!animating) createProject();
+            return true;
+        });
+
+    }
+
+    private void createProject(){
+        Intent i = new Intent(getActivity(), WallpaperEditor.class);
+        i.putExtra("Name", name);
+        i.putExtra("Width", width);
+        i.putExtra("Height", height);
+        requireActivity().getWindow().setExitTransition(new Explode());
+        startActivity(i);
+
+        dismiss();
     }
 
     private String normalizeString(String input) {

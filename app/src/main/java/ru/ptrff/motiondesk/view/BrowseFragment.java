@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -26,7 +25,6 @@ import android.widget.Toast;
 
 import java.util.Objects;
 
-import ru.ptrff.motiondesk.OnItemClickListener;
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.adapters.BrowseSectorAdapter;
 import ru.ptrff.motiondesk.databinding.FragmentBrowseBinding;
