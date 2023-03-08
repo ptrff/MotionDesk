@@ -68,73 +68,47 @@
                     android:layout_marginBottom="15dp"
                     android:orientation="vertical">
 
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:ellipsize="end"
+                        android:maxLines="4"
+                        android:text="A little name"
+                        android:textColor="?foregroundBlackWhite" />
+
+                    <TextView
+                        android:id="@+id/author"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="i_petroff"
+                        android:textColor="?foregroundBlackWhite"
+                        android:alpha="0.8"
+                        android:textSize="12sp" />
+
+                    <Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                    <com.google.android.flexbox.FlexboxLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        app:alignContent="stretch"
+                        app:alignItems="stretch"
+                        android:layout_marginBottom="2dp"
+                        app:flexWrap="wrap">
+
 
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:src="@drawable/ic_label"
-                                android:scaleType="centerCrop"
-                                app:tint="?foregroundBlackWhite" />
-
-                            <TextView
-                                android:id="@+id/name"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="15dp"
-                                android:translationX="-1dp"
-                                android:ellipsize="end"
-                                android:maxLines="4"
-                                android:text="A little name"
-                                android:textColor="?foregroundBlackWhite" />
-                        </LinearLayout>
-
-                        <Space
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
                             android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_weight="0"
-                                android:src="@drawable/ic_person"
-                                app:tint="?colorAccent" />
-
-                            <TextView
-                                android:id="@+id/author"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="15dp"
-                                android:text="i_petroff"
-                                android:textColor="?colorAccent"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-
-                        <Space
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
+                            android:layout_marginEnd="15dp"
                             android:orientation="horizontal">
 
                             <ImageView
@@ -147,22 +121,19 @@
                             <TextView
                                 android:id="@+id/stars"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="15dp"
-                                android:text="8.5/10"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:layout_marginLeft="5dp"
+                                android:text="8.5"
                                 android:textColor="?colorAccent"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
-                        <Space
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1" />
 
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
+                            android:layout_marginEnd="15dp"
                             android:orientation="horizontal">
 
                             <ImageView
@@ -174,22 +145,20 @@
 
                             <TextView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="15dp"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:layout_marginLeft="5dp"
                                 android:text="1920 x 1080"
                                 android:textColor="?colorAccent"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
-                        <Space
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1" />
 
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center_vertical"
+                            android:layout_marginEnd="15dp"
                             android:orientation="horizontal">
 
                             <ImageView
@@ -201,22 +170,20 @@
 
                             <TextView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="15dp"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:layout_marginLeft="5dp"
                                 android:text="8 Мб"
                                 android:textColor="?colorAccent"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
-                        <Space
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1" />
 
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center_vertical"
+                            android:layout_marginEnd="15dp"
                             android:orientation="horizontal">
 
                             <ImageView
@@ -229,22 +196,17 @@
                             <TextView
                                 android:id="@+id/rating"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="15dp"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:layout_marginLeft="5dp"
                                 android:text="18+"
                                 android:textColor="?colorAccent"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
-                        <Space
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="2dp"
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
@@ -258,14 +220,15 @@
                             <TextView
                                 android:id="@+id/downloads"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="15dp"
-                                android:text="495k."
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:layout_marginLeft="5dp"
+                                android:text="495k"
                                 android:textColor="?colorAccent"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
-                    </LinearLayout>
+                    </com.google.android.flexbox.FlexboxLayout>
 
                 </LinearLayout>
 

@@ -14,10 +14,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:singleLine="true"
+        android:maxLines="1"
         android:textSize="16sp"
         android:textColor="?foregroundBlackWhite"
         android:text="Название слоя"
         />
+
+    <ImageView
+        android:id="@+id/lock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:layout_marginStart="15dp"
+        android:src="@drawable/ic_lock_open"/>
 
     <ImageView
         android:id="@+id/visibility"

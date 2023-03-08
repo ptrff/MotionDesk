@@ -3,12 +3,12 @@ plugins {
 }
 android {
     namespace 'ru.ptrff.motiondesk'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "ru.ptrff.motiondesk"
         minSdk 23
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -106,4 +106,9 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
     implementation 'com.squareup.picasso:picasso:2.8'
+
+    def room_version = "2.5.0"
+    implementation "androidx.room:room-rxjava2:$room_version"
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
 }

@@ -139,7 +139,7 @@ public class InfoFragment extends BottomSheetDialogFragment {
         binding.name.setText(name);
         binding.author.setText(author);
         binding.description.setText(description);
-        binding.stars.setText(stars + "/10");
+        binding.stars.setText(String.valueOf(stars));
         binding.rating.setText(rating);
         binding.apply.setOnClickListener(click);
 

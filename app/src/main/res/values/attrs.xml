@@ -6,6 +6,7 @@
     <attr name="actionBarColor" format="reference" />
     <attr name="bottomNavBarChecked" format="reference" />
     <attr name="bottomNavBarNotChecked" format="reference" />
+    <attr name="halfTransparentBg" format="reference" />
 
     <declare-styleable name="ShimmerView">
         <attr name="shimmerColor" format="color" />

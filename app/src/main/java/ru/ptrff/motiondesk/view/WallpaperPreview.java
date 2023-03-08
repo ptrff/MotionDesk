@@ -44,7 +44,7 @@ public class WallpaperPreview extends AppCompatActivity implements  AndroidFragm
 
         setupActionBarButtons();
 
-        WallpaperEditorEngine engine = new WallpaperEditorEngine(150, 150, false, new EngineEventsListener() {
+        WallpaperEditorEngine engine = new WallpaperEditorEngine(150, 150, new EngineEventsListener() {
             @Override
             public void onObjectSelected(String type, int index) {
 
@@ -52,6 +52,16 @@ public class WallpaperPreview extends AppCompatActivity implements  AndroidFragm
 
             @Override
             public void onObjectNotSelected() {
+
+            }
+
+            @Override
+            public void onObjectAdded(int position) {
+
+            }
+
+            @Override
+            public void onObjectRemoved(int position) {
 
             }
         });

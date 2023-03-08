@@ -45,13 +45,17 @@ public class MainViewModel extends AndroidViewModel {
                 fragment = new EditProfileFragment();
                 break;
             case 4:
-                fragment = new AuthFragment();
+                fragment = new EditProfileFragment();
                 break;
             default:
                 fragment=libFragment;
                 break;
         }
         currentFragment.setValue(fragment);
+    }
+
+    public LibFragment getLibFragment(){
+        return libFragment;
     }
 
     public LiveData<Fragment> getCurrentFragment() {

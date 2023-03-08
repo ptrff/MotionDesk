@@ -46,7 +46,12 @@ public class AuthFragment extends Fragment {
     private FragmentAuthBinding binding;
     private boolean passwordFilled = false;
     private boolean nicknameFilled = false;
+    private final AuthCloser authCloser;
     private PopupWindow loadingWindow;
+
+    AuthFragment(AuthCloser closer){
+        authCloser = closer;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,7 +72,6 @@ public class AuthFragment extends Fragment {
 
         return binding.getRoot();
     }
-
 
 
     private void setupOrientation(int orientation){
@@ -113,6 +117,7 @@ public class AuthFragment extends Fragment {
                 t.schedule(new TimerTask() {
                     @Override
                     public void run() {
+                        authCloser.closeAuthPage();
                         closeLoading();
                         t.cancel();
                     }
@@ -176,7 +181,6 @@ public class AuthFragment extends Fragment {
             textfieldColor = typedValue.data;
         }
         binding.login.setBackgroundTintList(ColorStateList.valueOf(loginButtonColor));
-        //binding.login.setTextColor(ColorStateList.valueOf(loginButtonColor));
         binding.password.setBackgroundTintList(ColorStateList.valueOf(loginButtonColor));
         binding.password.setTextColor(ColorStateList.valueOf(loginButtonColor));
         binding.password.setHintTextColor(ColorStateList.valueOf(loginButtonColor));
@@ -323,5 +327,9 @@ public class AuthFragment extends Fragment {
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         setupOrientation(newConfig.orientation);
+    }
+
+    public interface AuthCloser{
+        void closeAuthPage();
     }
 }

@@ -53,7 +53,8 @@ public class ImageActor extends Actor {
         stroke.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
-    public void setSize(int width, int height){
+    @Override
+    public void setSize(float width, float height){
         setWidth(width);
         setHeight(height);
         setBounds(getX(), getY(), width, height);

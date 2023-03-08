@@ -13,7 +13,9 @@
     <color name="red">#A31E15</color>
     <color name="black">#121212</color>
     <color name="true_black">#000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="half_white">#EEFFFFFF</color>
+    <color name="half_black">#EE121212</color>
     <color name="transparent">#00000000</color>
 
     <color name="darker_blue_grey">#22223B</color>

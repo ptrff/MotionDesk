@@ -55,7 +55,7 @@ public class LibViewModel extends AndroidViewModel {
                                 "i_petroff",
                                 "description",
                                 new Random().nextInt(100)/10f,
-                                "Для всех",
+                                "Safe",
                                 "link"
                         )
                 );
@@ -72,7 +72,7 @@ public class LibViewModel extends AndroidViewModel {
                         "i_petroff",
                         "description",
                         new Random().nextInt(100)/10f,
-                        "Для всех",
+                        "Safe",
                         "link"
                 )
         );

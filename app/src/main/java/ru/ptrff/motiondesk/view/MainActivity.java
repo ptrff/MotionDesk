@@ -8,7 +8,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.View;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.google.android.material.appbar.AppBarLayout;
 
 import ru.ptrff.motiondesk.utils.Converter;
@@ -19,9 +21,10 @@ import ru.ptrff.motiondesk.viewmodel.MainViewModel;
 
 
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private MainViewModel viewModel;
+    private AuthFragment authFragment;
     private final FragmentManager fm = getSupportFragmentManager();
 
     @Override
@@ -39,10 +42,16 @@ public class MainActivity extends AppCompatActivity  {
 
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
-        observeContent();
         addBottomNavigationHiding();
-        addBottomNavigationSelectionListener();
 
+        if(false){
+            binding.appbar.setExpanded(false);
+            authFragment = new AuthFragment(setupAuthCloser());
+            showAuthPage();
+        }else {
+            observeContent();
+            addBottomNavigationSelectionListener();
+        }
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -102,6 +111,30 @@ public class MainActivity extends AppCompatActivity  {
             transaction.commit();
         });
     }
+
+    private void showAuthPage() {
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(binding.content.getId(), viewModel.getLibFragment());
+        transaction.add(binding.content.getId(), authFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    private AuthFragment.AuthCloser setupAuthCloser() {
+        return () -> {
+            runOnUiThread(() -> {
+                binding.appbar.setExpanded(true);
+                FragmentTransaction transaction = fm.beginTransaction();
+                transaction.remove(authFragment);
+                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                transaction.commit();
+
+                observeContent();
+                addBottomNavigationSelectionListener();
+            });
+        };
+    }
+
 
     private void addBottomNavigationHiding() {
         binding.appbar.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {

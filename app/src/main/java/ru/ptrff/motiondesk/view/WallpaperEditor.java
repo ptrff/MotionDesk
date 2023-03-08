@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,7 @@ import ru.ptrff.motiondesk.adapters.ToolbarAdapter;
 import ru.ptrff.motiondesk.data.ToolItem;
 import ru.ptrff.motiondesk.databinding.ActivityWallpaperEditorBinding;
 import ru.ptrff.motiondesk.databinding.StateViewBinding;
+import ru.ptrff.motiondesk.engine.ActorHandler;
 import ru.ptrff.motiondesk.engine.EngineEventsListener;
 import ru.ptrff.motiondesk.engine.ImageActor;
 import ru.ptrff.motiondesk.engine.WallpaperEditorEngine;
@@ -50,7 +53,6 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
     private ToolbarAdapter toolbarAdapter;
     private final List<ToolItem> tools = new ArrayList<>();
     private WallpaperLibGdxFragment libgdxFragment;
-    private final FragmentManager fm = getSupportFragmentManager();
     private WallpaperEditorEngine engine;
     private String toolbarStatus;
     private String name;
@@ -71,7 +73,7 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
         height = getIntent().getIntExtra("Height", 2340);
         name = getIntent().getStringExtra("Name");
 
-        engine = new WallpaperEditorEngine(width, height, isNightMode(), engineEventsListener);
+        engine = new WallpaperEditorEngine(width, height, engineEventsListener);
 
         libgdxFragment = new WallpaperLibGdxFragment(engine);
         getSupportFragmentManager().beginTransaction().
@@ -148,20 +150,27 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
     private final ToolbarAdapter.OnImageClickListener toolClickListener = new ToolbarAdapter.OnImageClickListener() {
         @Override
         public void onImageClick(ToolItem tool) {
-            if (tool.getLabel() == "Добавить") {
-                chooseImage();
-            } else {
-                BottomSheetBehavior.from(binding.bottomView).setState(BottomSheetBehavior.STATE_COLLAPSED);
-                binding.title.setText(tool.getLabel());
-                binding.content.addView(getLayoutInflater().inflate(R.layout.fragment_editor_layers, null));
-                RecyclerView recyclerView = binding.content.findViewById(R.id.layer_list);
-                LayerListAdapter adapter = new LayerListAdapter(engine.getObjectList(), WallpaperEditor.this);
-                recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                recyclerView.setAdapter(adapter);
+            switch (tool.getLabel()) {
+                case "Добавить":
+                    chooseImage();
+                    break;
+                case "Удалить":
+                    engine.removeObject();
+                    break;
+                default:
+                    BottomSheetBehavior.from(binding.bottomView).setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    binding.title.setText(tool.getLabel());
+                    binding.icon.setImageResource(tool.getImageResourse());
+                    binding.content.addView(getLayoutInflater().inflate(R.layout.fragment_editor_layers, null));
+                    RecyclerView recyclerView = binding.content.findViewById(R.id.layer_list);
+                    LayerListAdapter adapter = new LayerListAdapter(engine.getObjectList(), engine.getStageActorArray(), WallpaperEditor.this);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, true));
+                    recyclerView.setAdapter(adapter);
 
-                ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
-                touchHelper = new ItemTouchHelper(callback);
-                touchHelper.attachToRecyclerView(recyclerView);
+                    ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
+                    touchHelper = new ItemTouchHelper(callback);
+                    touchHelper.attachToRecyclerView(recyclerView);
+                    break;
             }
         }
     };
@@ -183,6 +192,29 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
                     resetTools();
                     getSupportActionBar().setTitle(name);
                 });
+        }
+
+        @Override
+        public void onObjectAdded(int position) {
+            if(binding.title.getText().equals("Слои")){
+                ((RecyclerView) binding.content.findViewById(R.id.layer_list))
+                        .getAdapter().notifyItemInserted(position);
+            }
+        }
+
+        @Override
+        public void onObjectRemoved(int position) {
+            BottomSheetBehavior behavior = BottomSheetBehavior.from(binding.bottomView);
+            if(binding.title.getText().equals("Слои") && behavior.getState()!=BottomSheetBehavior.STATE_HIDDEN){
+                RecyclerView recyclerView = binding.content.findViewById(R.id.layer_list);
+                recyclerView.getAdapter().notifyItemRemoved(position);
+                LayerListAdapter adapter = new LayerListAdapter(engine.getObjectList(), engine.getStageActorArray(), WallpaperEditor.this);
+                recyclerView.setAdapter(adapter);
+
+                ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
+                touchHelper = new ItemTouchHelper(callback);
+                touchHelper.attachToRecyclerView(recyclerView);
+            }
         }
     };
 
@@ -285,12 +317,31 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
     }
 
     @Override
-    public void onLayerClick(ImageActor object) {
+    public void onLayerClick(ActorHandler object) {
         engine.chooseObject(object);
     }
 
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         touchHelper.startDrag(viewHolder);
+    }
+
+    private void saveProject(){
+        FileOutputStream fos = null;
+        try {
+            fos = openFileOutput(name, MODE_PRIVATE);
+            // fos.write(text.getBytes());      jsonchik
+            Toast.makeText(this, "Файл сохранен", Toast.LENGTH_SHORT).show();
+        } catch(IOException ex) {
+            Toast.makeText(this, "Error: "+ ex.getMessage(), Toast.LENGTH_SHORT).show();
+        } finally{
+            try{
+                if(fos!=null)
+                    fos.close();
+            }
+            catch(IOException ex){
+                Toast.makeText(this,"Error: "+ ex.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

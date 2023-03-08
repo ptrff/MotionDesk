@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.transition.Explode;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -30,6 +31,14 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import io.reactivex.Observer;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import ru.ptrff.motiondesk.data.Project;
+import ru.ptrff.motiondesk.data.ProjectDB;
+import ru.ptrff.motiondesk.data.ProjectDao;
 import ru.ptrff.motiondesk.utils.Converter;
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.data.WallpaperItem;
@@ -64,6 +73,41 @@ public class LibFragment extends Fragment {
         observeContent();
         generateWhileScrolling();
 
+
+        viewModel.init(15);
+
+
+        ProjectDB projectDB = ProjectDB.getInstance(requireContext());
+        ProjectDao projectDao = projectDB.projectDao();
+
+        projectDao.addProject(new Project("NAmee", "dedededede", 5.8f))
+                .subscribeOn(Schedulers.io())
+                .subscribe(() -> {});
+        projectDao.getProject(0)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Project>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Project project) {
+                        Log.d("MYLOG", project.toString());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
         return binding.getRoot();
     }
 
@@ -89,7 +133,6 @@ public class LibFragment extends Fragment {
     private void setupPullToRefresh() {
         final SwipeRefreshLayout pullToRefresh = binding.libRefresh;
         pullToRefresh.setOnRefreshListener(() -> {
-            viewModel.init(15);
             pullToRefresh.setRefreshing(false);
         });
     }
