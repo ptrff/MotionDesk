@@ -5,4 +5,6 @@ public interface EngineEventsListener {
     void onObjectNotSelected();
     void onObjectAdded(int position);
     void onObjectRemoved(int position);
+    void onStartDrawingMask(int index);
+    void onStopDrawingMask();
 }

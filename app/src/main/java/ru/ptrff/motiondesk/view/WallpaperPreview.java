@@ -64,6 +64,16 @@ public class WallpaperPreview extends AppCompatActivity implements  AndroidFragm
             public void onObjectRemoved(int position) {
 
             }
+
+            @Override
+            public void onStartDrawingMask(int index) {
+
+            }
+
+            @Override
+            public void onStopDrawingMask() {
+
+            }
         });
 
         WallpaperLibGdxFragment libgdxFragment = new WallpaperLibGdxFragment(engine);

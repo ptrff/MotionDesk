@@ -42,7 +42,14 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
 
     }
 
+    @Override
+    public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+        helperAdapter.onItemMovingEnd();
+        super.clearView(recyclerView, viewHolder);
+    }
+
     public interface ItemTouchHelperAdapter {
         void onItemMove(int fromPosition, int toPosition);
+        void onItemMovingEnd();
     }
 }

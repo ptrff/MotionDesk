@@ -19,6 +19,7 @@
     <color name="transparent">#00000000</color>
 
     <color name="darker_blue_grey">#22223B</color>
+    <color name="darker_red">#3B2222</color>
     <color name="blue_grey">#4A4E69</color>
     <color name="unsaturated_dark_skintone">#9A8C98</color>
     <color name="skintone">#C9ADA7</color>

@@ -6,10 +6,12 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import android.transition.Explode;
 import android.util.TypedValue;
@@ -169,7 +171,7 @@ public class InfoFragment extends BottomSheetDialogFragment {
             tagLayoutParams.setMargins(0, 15, 15, 0);
             tagView.setLayoutParams(tagLayoutParams);
             tagView.setText(tag);
-            tagView.setBackground(requireContext().getResources().getDrawable(R.drawable.tag_background));
+            tagView.setBackground(getResources().getDrawable(R.drawable.tag_background));
             theme.resolveAttribute(com.google.android.material.R.attr.colorPrimaryVariant, typedValue, true);
             tagView.setBackgroundTintList(ColorStateList.valueOf(typedValue.data));
             tagView.setPadding(15, 5, 15, 5);

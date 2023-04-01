@@ -1,9 +1,9 @@
 package ru.ptrff.motiondesk.engine;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
-import android.os.Build;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -13,49 +13,33 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.crashinvaders.vfx.effects.ChromaticAberrationEffect;
-import com.crashinvaders.vfx.effects.FisheyeEffect;
-import com.crashinvaders.vfx.effects.OldTvEffect;
-import com.crashinvaders.vfx.effects.WaterDistortionEffect;
-import com.crashinvaders.vfx.effects.ZoomEffect;
-import com.crashinvaders.vfx.scene2d.VfxWidgetGroup;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import ru.ptrff.motiondesk.R;
 
 public class WallpaperEditorEngine extends Group implements Screen, GestureDetector.GestureListener {
 
     //Base
     private final EngineEventsListener engineEventsListener;
-    private final int width;
     private final int height;
-    private boolean playing=true;
+    private final int width;
+    private boolean playing = true;
+    private Resources resources;
 
     //Scene
     private OrthographicCamera camera;
     private Rectangle workingArea;
     private Texture backgroundTexture;
     private Batch batch;
-    private Stage stage;
-
-    //Shaders
-    GlitchEffect glitchEffect;
-    OldTvEffect oldTvEffect;
-    List<ActorHandler> objects;
+    private StageWrapper stage;
+    //List<ActorHandler> objects;
 
     //Gestures
     private int draggedSpriteId = 0;
@@ -66,6 +50,8 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
     private float lastScaleX = 0;
     private float lastScaleY = 0;
     private boolean isZooming = false;
+    private boolean twoFingerMovement = false;
+    private boolean drawingMask = false;
     private final Vector2 initialTouch1 = new Vector2();
     private final Vector2 initialTouch2 = new Vector2();
 
@@ -85,23 +71,67 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
         batch = new SpriteBatch();
 
         //Scene
-        stage = new Stage(new ScreenViewport(camera), batch);
+        stage = new StageWrapper(new ScreenViewport(camera), batch);
+        //stage = new ArrayList<>();
 
-        objects = new ArrayList<>();
-        objects.add(createImage("kitik.jpg"));
-        stage.addActor(objects.get(0));
-        glitchEffect = new GlitchEffect();
-        oldTvEffect = new OldTvEffect();
-        objects.get(0).getVfxManager().addEffect(glitchEffect);
+
+        ActorHandler a = createImage("kitik.jpg");
+        a.setActorPosition(100, 100);
+        stage.addActor(a);
+        ActorHandler b = createImage("kitik.jpg");
+        b.setActorPosition(200, 200);
+        stage.addActor(b);
+        ActorHandler c = createImage("kitik.jpg");
+        c.setActorPosition(300, 300);
+        stage.addActor(c);
 
         createWorkingAreaBackground(width, height);
+        centerCamera(-1);
+
         Gdx.input.setInputProcessor(new GestureDetector(this));
     }
 
     public ActorHandler createImage(String imagePath) {
-        TextureRegion texture = new TextureRegion(new Texture(imagePath));
-        ImageActor image = new ImageActor(texture, "Имечко"+objects.size());
-        return new ActorHandler(image);
+        Texture texture = new Texture(imagePath);
+        ImageActor image = new ImageActor(texture, "fdsf" + stage.getActors().size);
+        ActorHandler actorHandler = new ActorHandler(image);
+        //actorHandler.addEffect(new ShakeEffect("Effect name", new Texture("mask.png")));
+        return actorHandler;
+    }
+
+    public boolean isObjectSelected(){
+        return dragSprite || canDragObject;
+    }
+
+    public void startDrawingMask() {
+        twoFingerMovement=true;
+        drawingMask=true;
+        centerCamera(draggedSpriteId);
+        stage.get(draggedSpriteId).addMask();
+        engineEventsListener.onStartDrawingMask(draggedSpriteId);
+    }
+
+    public void stopDrawingMask(){
+        twoFingerMovement=false;
+        drawingMask=false;
+        engineEventsListener.onStopDrawingMask();
+    }
+
+    public void centerCamera(int id) {
+        if (id == -1) {
+            camera.position.x = Gdx.graphics.getWidth()/2;
+            camera.position.y = Gdx.graphics.getHeight()/2;
+            if(workingArea.getHeight()>workingArea.getWidth()) camera.zoom = (workingArea.getHeight()/Gdx.graphics.getHeight())*0.25f+1;
+            else camera.zoom = (workingArea.getWidth()/Gdx.graphics.getWidth())*0.25f+1;
+        } else {
+            ActorHandler actor = getObject(id);
+
+            camera.position.x = actor.getActorX() + actor.getActorWidth() / 2;
+            camera.position.y = actor.getActorY() + actor.getActorHeight() / 2;
+            if(actor.getActorHeight()>actor.getActorWidth()) camera.zoom = (actor.getActorHeight()/Gdx.graphics.getHeight())*0.25f+1;
+            else camera.zoom = (actor.getActorWidth()/Gdx.graphics.getWidth())*0.25f+1;
+        }
+        if(dragSprite) stage.get(draggedSpriteId).setActorZoomAmount(camera.zoom);
     }
 
     private void createWorkingAreaBackground(int width, int height) {
@@ -138,44 +168,46 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
             bitmap.recycle();
-            ImageActor image = new ImageActor(new TextureRegion(texture), "Имечко"+objects.size());
-            objects.add(new ActorHandler(image));
-            objects.get(objects.size()-1).getVfxManager().addEffect(new ChromaticAberrationEffect(5));
-            stage.addActor(objects.get(objects.size()-1));
-            engineEventsListener.onObjectAdded(objects.size()-1);
+            ImageActor image = new ImageActor(texture, resources.getString(R.string.new_layer) + " " + stage.getActors().size);
+            ActorHandler actorHandler = new ActorHandler(image);
+
+            stage.add(actorHandler);
+            stage.addActor(actorHandler);
+            engineEventsListener.onObjectAdded(stage.size() - 1);
         });
     }
 
-    public void removeObject(){
-        //objects.get(draggedSpriteId).dispose();
-        objects.get(draggedSpriteId).getImageActor().remove();
-        objects.get(draggedSpriteId).remove();
-        objects.remove(objects.get(draggedSpriteId));
+    public void removeObject() {
+        //stage.get(draggedSpriteId).dispose();
+        stage.get(draggedSpriteId).getImageActor().remove();
+        stage.get(draggedSpriteId).remove();
+        //objects.remove(stage.get(draggedSpriteId));
         engineEventsListener.onObjectRemoved(draggedSpriteId);
         engineEventsListener.onObjectNotSelected();
-        canDragObject=false;
-        dragSprite=false;
+        canDragObject = false;
+        dragSprite = false;
     }
 
-    public ActorHandler getObject(int index){
-        return objects.get(index);
+    public ActorHandler getObject(int index) {
+        return stage.get(index);
     }
 
-    public List<ActorHandler> getObjectList(){
-        return objects;
+//    public List<ActorHandler> getObjectList(){
+//        return stage;
+//    }
+
+    public Array<ActorHandler> getStageActorArray() {
+        return stage.getObjects();
     }
 
-    public Array<Actor> getStageActorArray(){
-        return stage.getActors();
-    }
-
-    public void chooseObject(ActorHandler object){
-        int selectedObjectIndex = objects.indexOf(object);
-        ActorHandler sprite = objects.get(selectedObjectIndex);
-        sprite.addStroke();
-        draggedSpriteId=selectedObjectIndex;
+    public void chooseObject(ActorHandler object) {
+        if (canDragObject) {
+            stage.get(draggedSpriteId).removeStroke();
+        }
+        draggedSpriteId = stage.indexOf(object);
+        stage.get(draggedSpriteId).addStroke();
         engineEventsListener.onObjectSelected("Image", draggedSpriteId);
-        canDragObject =true;
+        canDragObject = true;
     }
 
     @Override
@@ -196,16 +228,16 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
 
     @Override
     public void pause() {
-        playing=false;
+        playing = false;
     }
 
     @Override
     public void resume() {
-        playing=true;
+        playing = true;
     }
 
-    public void playPause(){
-        if(playing) pause();
+    public void playPause() {
+        if (playing) pause();
         else resume();
     }
 
@@ -221,13 +253,14 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
         }
         batch.end();
 
-        for(ActorHandler object:objects){
+
+        for (ActorHandler object : stage.getObjects()) {
             object.setWidth(Gdx.graphics.getWidth() * camera.zoom);
             object.setHeight(Gdx.graphics.getHeight() * camera.zoom);
             object.setPosition(camera.position.x - Gdx.graphics.getWidth() * camera.zoom / 2, camera.position.y - Gdx.graphics.getHeight() * camera.zoom / 2);
         }
 
-        if(playing) stage.act(delta);
+        if (playing) stage.act(delta);
         stage.draw();
     }
 
@@ -236,9 +269,9 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
 
     }
 
-    private int checkForObjects(float x, float y) {
-        for (int i = 0; i<objects.size();i++) {
-            ActorHandler sprite = objects.get(objects.size()-1-i);
+    private int checkForActors(float x, float y) {
+        for (int i = 0; i < stage.size(); i++) {
+            ActorHandler sprite = stage.get(stage.size() - 1 - i);
             Vector2 screenCoordinates = new Vector2(x, y);
             Vector3 worldCoordinates = camera.unproject(new Vector3(screenCoordinates.x, screenCoordinates.y, 0));
             if (sprite.getActorX() < worldCoordinates.x && worldCoordinates.x < sprite.getActorX() + sprite.getActorWidth()
@@ -246,37 +279,38 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
                     && sprite.getVisibility() && !sprite.getLockStatus()) {
                 sprite.addStroke();
                 canDragObject = true;
-                return objects.indexOf(sprite);
+                return stage.indexOf(sprite);
             }
         }
         return -1;
     }
-
-    private final Vector2 sum2 = new Vector2();
 
     @Override
     public boolean touchDown(float x, float y, int pointer, int button) {
         if (pointer == 0) {
             initialTouch1.set(x, y);
         }
-        if (pointer == 1)
+        if (pointer == 1) {
             initialTouch2.set(x, y);
-
-        if (canDragObject && checkForObjects(x, y) == draggedSpriteId) {
-            dragSprite = true;
-            engineEventsListener.onObjectSelected("Image", draggedSpriteId);
-        } else if (checkForObjects(x, y) != -1) {
-            if(objects.size()!=0 && objects.size()>draggedSpriteId)
-                objects.get(draggedSpriteId).removeStroke();
-            draggedSpriteId = checkForObjects(x, y);
-            engineEventsListener.onObjectSelected("Image", draggedSpriteId);
-            objects.get(draggedSpriteId).setZoomAmount(camera.zoom);
-        } else {
-            dragSprite = false;
-            canDragObject = false;
-            if(objects.size()!=0 && objects.size()>draggedSpriteId)
-                objects.get(draggedSpriteId).removeStroke();
-            engineEventsListener.onObjectNotSelected();
+            isTwoFinger=true;
+        }
+        if(!drawingMask) {
+            if (canDragObject && checkForActors(x, y) == draggedSpriteId) {
+                dragSprite = true;
+                engineEventsListener.onObjectSelected("Image", draggedSpriteId);
+            } else if (checkForActors(x, y) != -1) {
+                if (stage.size() != 0 && stage.size() > draggedSpriteId)
+                    stage.get(draggedSpriteId).removeStroke();
+                draggedSpriteId = checkForActors(x, y);
+                engineEventsListener.onObjectSelected("Image", draggedSpriteId);
+                stage.get(draggedSpriteId).setActorZoomAmount(camera.zoom);
+            } else {
+                dragSprite = false;
+                canDragObject = false;
+                if (stage.size() != 0 && stage.size() > draggedSpriteId)
+                    stage.get(draggedSpriteId).removeStroke();
+                engineEventsListener.onObjectNotSelected();
+            }
         }
 
         return true;
@@ -286,21 +320,26 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
     public boolean pan(float x, float y, float deltaX, float deltaY) {
         if (Math.abs(deltaX) < 0.1f && Math.abs(deltaY) < 0.1f) return false;
 
-        if (canDragObject && !dragSprite) {
-            engineEventsListener.onObjectNotSelected();
-            objects.get(draggedSpriteId).removeStroke();
-            canDragObject = false;
-        }
-        if (dragSprite) {
-            float newX = objects.get(draggedSpriteId).getActorX() + (deltaX) * camera.zoom;
-            float newY = objects.get(draggedSpriteId).getActorY() - (deltaY) * camera.zoom;
+        if(!twoFingerMovement) {
+            if (canDragObject && !dragSprite) {
+                engineEventsListener.onObjectNotSelected();
+                stage.get(draggedSpriteId).removeStroke();
+                canDragObject = false;
+            }
+            if (dragSprite && !twoFingerMovement) {
+                float newX = stage.get(draggedSpriteId).getActorX() + (deltaX) * camera.zoom;
+                float newY = stage.get(draggedSpriteId).getActorY() - (deltaY) * camera.zoom;
 
-            objects.get(draggedSpriteId).setActorPosition(newX, newY);
+                stage.get(draggedSpriteId).setActorPosition(newX, newY);
 
 
+            } else if (!twoFingerMovement) {
+                camera.translate(-deltaX * camera.zoom, deltaY * camera.zoom);
+            }
         } else {
-            camera.translate(-deltaX * camera.zoom, deltaY * camera.zoom);
+            stage.get(draggedSpriteId).drawMask(x, y, deltaX, deltaY);
         }
+
         return true;
     }
 
@@ -313,7 +352,10 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
             lastZoom = 0;
             lastScaleY = 0;
             lastScaleX = 0;
-            sum2.set(0, 0);
+        }
+        if(twoFingerMovement){
+            lastTwoFingerMoveY=0;
+            lastTwoFingerMoveX=0;
         }
 
         return true;
@@ -326,19 +368,19 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
         float normalizedZoomAmount = zoomAmount / (float) Math.sqrt(Math.pow(Gdx.graphics.getWidth(), 2) + Math.pow(Gdx.graphics.getHeight(), 2));
 
         if (dragSprite) {
-            objects.get(draggedSpriteId).setZoomAmount(camera.zoom);
-            objects.get(draggedSpriteId).setActorSize(
-                    objects.get(draggedSpriteId).getActorWidth() - normalizedZoomAmount * objects.get(draggedSpriteId).getActorWidth() + lastScaleX,
-                    objects.get(draggedSpriteId).getActorHeight() - normalizedZoomAmount * objects.get(draggedSpriteId).getActorHeight() + lastScaleY
+            stage.get(draggedSpriteId).setActorZoomAmount(camera.zoom);
+            stage.get(draggedSpriteId).setActorSize(
+                    stage.get(draggedSpriteId).getActorWidth() - normalizedZoomAmount * stage.get(draggedSpriteId).getActorWidth() + lastScaleX,
+                    stage.get(draggedSpriteId).getActorHeight() - normalizedZoomAmount * stage.get(draggedSpriteId).getActorHeight() + lastScaleY
             );
 
-//            objects.get(draggedSpriteId).getImageActor().setPosition(
-//                    objects.get(draggedSpriteId).getX() + normalizedZoomAmount/2 * objects.get(draggedSpriteId).getWidth() - lastScaleX/2,
-//                    objects.get(draggedSpriteId).getY() + normalizedZoomAmount/2 * objects.get(draggedSpriteId).getHeight() - lastScaleY/2
-//            );
+            stage.get(draggedSpriteId).setActorPosition(
+                    stage.get(draggedSpriteId).getActorX() + normalizedZoomAmount/2 * stage.get(draggedSpriteId).getActorWidth() - lastScaleX/2,
+                    stage.get(draggedSpriteId).getActorY() + normalizedZoomAmount/2 * stage.get(draggedSpriteId).getActorHeight() - lastScaleY/2
+            );
 
-            lastScaleX = normalizedZoomAmount * objects.get(draggedSpriteId).getActorWidth();
-            lastScaleY = normalizedZoomAmount * objects.get(draggedSpriteId).getActorHeight();
+            lastScaleX = normalizedZoomAmount * stage.get(draggedSpriteId).getActorWidth();
+            lastScaleY = normalizedZoomAmount * stage.get(draggedSpriteId).getActorHeight();
 
         } else {
             camera.zoom += normalizedZoomAmount * camera.zoom - lastZoom;
@@ -348,6 +390,14 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
         }
 
         return true;
+    }
+
+    public void setResources(Resources resources) {
+        this.resources = resources;
+    }
+
+    public int getDraggedSpriteId() {
+        return draggedSpriteId;
     }
 
     @Override
@@ -365,8 +415,22 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
         return false;
     }
 
+    float lastTwoFingerMoveX = 0;
+    float lastTwoFingerMoveY = 0;
+
     @Override
     public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
+        if(twoFingerMovement && isTwoFinger){
+            float newX = (pointer1.x-initialPointer1.x + pointer2.x-initialPointer2.x) * camera.zoom/2;
+            float newY = (pointer1.y-initialPointer1.y + pointer2.y-initialPointer2.y) * camera.zoom/2;
+            stage.get(draggedSpriteId).setActorPosition(
+                    stage.get(draggedSpriteId).getActorX()+newX-lastTwoFingerMoveX,
+                    stage.get(draggedSpriteId).getActorY()-newY+lastTwoFingerMoveY
+            );
+            lastTwoFingerMoveX = newX;
+            lastTwoFingerMoveY = newY;
+        }
+
         return false;
     }
 

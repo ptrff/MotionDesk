@@ -47,6 +47,10 @@ public class ToolbarAdapter extends RecyclerView.Adapter<ToolbarAdapter.ToolItem
         binding.label.setText(tool.getLabel());
     }
 
+    public int getToolPosition(ToolItem item){
+        return tools.indexOf(item);
+    }
+
     @Override
     public int getItemCount() {
         return tools.size();

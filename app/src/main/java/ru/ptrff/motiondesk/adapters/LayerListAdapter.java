@@ -1,6 +1,7 @@
 package ru.ptrff.motiondesk.adapters;
 
 import android.annotation.SuppressLint;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,28 +13,19 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
-import com.crashinvaders.vfx.scene2d.VfxWidgetGroup;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.databinding.LayerItemBinding;
 import ru.ptrff.motiondesk.engine.ActorHandler;
-import ru.ptrff.motiondesk.engine.ImageActor;
 import ru.ptrff.motiondesk.view.ItemMoveCallback;
 
 public class LayerListAdapter extends RecyclerView.Adapter<LayerListAdapter.LayerItemHolder> implements ItemMoveCallback.ItemTouchHelperAdapter {
 
-    private final List<ActorHandler> objects;
-    private final Array<Actor> actorArray;
+    private final Array<ActorHandler> actorArray;
     private final LayerListeners listeners;
 
-    public LayerListAdapter(List<ActorHandler> widgetGroup, Array<Actor> actorArray, LayerListeners listeners) {
-        this.objects = widgetGroup;
+    public LayerListAdapter(Array<ActorHandler> actorArray, LayerListeners listeners) {
         this.actorArray = actorArray;
         this.listeners = listeners;
     }
@@ -47,12 +39,14 @@ public class LayerListAdapter extends RecyclerView.Adapter<LayerListAdapter.Laye
         return new LayerItemHolder(binding);
     }
 
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onBindViewHolder(@NonNull LayerItemHolder holder, int position) {
-        holder.name.setText(objects.get(position).getName());
+        holder.name.setText(actorArray.get(position).getName());
         holder.root.setOnClickListener(view -> {
-            listeners.onLayerClick(objects.get(position));
+            System.out.println(position+"  "+holder.name.getText());
+            listeners.onLayerClick(getActorHandler(position));
         });
         holder.dragHandle.setOnTouchListener((v, event) -> {
             if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
@@ -61,28 +55,32 @@ public class LayerListAdapter extends RecyclerView.Adapter<LayerListAdapter.Laye
             return true;
         });
         holder.lock.setOnClickListener(v -> {
-            if(objects.get(position).getLockStatus()){
+            if (getActorHandler(position).getLockStatus()) {
                 holder.lock.setImageResource(R.drawable.ic_lock_open);
-                objects.get(position).setLockStatus(false);
-            }else{
+                getActorHandler(position).setLockStatus(false);
+            } else {
                 holder.lock.setImageResource(R.drawable.ic_lock_closed);
-                objects.get(position).setLockStatus(true);
+                getActorHandler(position).setLockStatus(true);
             }
         });
         holder.visibility.setOnClickListener(v -> {
-            if(objects.get(position).getVisibility()){
+            if (getActorHandler(position).getVisibility()) {
                 holder.visibility.setImageResource(R.drawable.ic_eye_closed);
-                objects.get(position).setVisibility(false);
-            }else{
+                getActorHandler(position).setVisibility(false);
+            } else {
                 holder.visibility.setImageResource(R.drawable.ic_eye);
-                objects.get(position).setVisibility(true);
+                getActorHandler(position).setVisibility(true);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return objects.size();
+        return actorArray.size;
+    }
+
+    private ActorHandler getActorHandler(int id) {
+        return actorArray.get(id);
     }
 
 
@@ -90,16 +88,24 @@ public class LayerListAdapter extends RecyclerView.Adapter<LayerListAdapter.Laye
     public void onItemMove(int fromPosition, int toPosition) {
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
-                Collections.swap(objects, i, i + 1);
-                Collections.swap(Arrays.asList(actorArray.items), i, i + 1);
+                actorArray.swap(i, i + 1);
+                notifyItemMoved(i, i + 1);
             }
         } else {
             for (int i = fromPosition; i > toPosition; i--) {
-                Collections.swap(objects, i, i - 1);
-                Collections.swap(Arrays.asList(actorArray.items), i, i - 1);
+                actorArray.swap(i, i - 1);
+                notifyItemMoved(i, i - 1);
             }
         }
-        notifyItemMoved(fromPosition, toPosition);
+        //notifyItemMoved(fromPosition, toPosition);
+        //notifyItemRangeChanged(fromPosition, fromPosition-toPosition);
+        //notifyDataSetChanged();
+        //notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onItemMovingEnd() {
+        notifyDataSetChanged();
     }
 
     public static class LayerItemHolder extends RecyclerView.ViewHolder {
