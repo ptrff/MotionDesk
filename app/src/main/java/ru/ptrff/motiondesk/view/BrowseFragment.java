@@ -164,13 +164,7 @@ public class BrowseFragment extends Fragment {
     }
 
     public OnItemClickListener itemClick = (item, position) -> {
-        InfoFragment infoFragment = new InfoFragment();
-        infoFragment.setAuthor(item.getAuthor());
-        infoFragment.setName(item.getName());
-        infoFragment.setDescription(item.getDescription());
-        infoFragment.setStars(item.getStars());
-        infoFragment.setRating(item.getRating());
-        //infoFragment.setPreviewBitmap(item.getImage());
+        InfoFragment infoFragment = new InfoFragment(item, null);
         infoFragment.setButtonOnClickListener(view -> {
             Toast.makeText(getContext(), "tapped", Toast.LENGTH_SHORT).show();
         });

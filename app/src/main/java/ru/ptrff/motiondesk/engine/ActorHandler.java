@@ -26,6 +26,11 @@ public class ActorHandler extends VfxWidgetGroup {
         getVfxManager().addEffect(effect, effects.size());
     }
 
+    public void addEffects(List<BaseEffect> effects){
+        for(BaseEffect effect:effects)
+            addEffect(effect);
+    }
+
     public List<BaseEffect> getEffects() {
         return effects;
     }
@@ -123,6 +128,10 @@ public class ActorHandler extends VfxWidgetGroup {
         }else {
             return null;
         }
+    }
+
+    public boolean haveMask(){
+        return mask;
     }
 
     public boolean getLockStatus(){

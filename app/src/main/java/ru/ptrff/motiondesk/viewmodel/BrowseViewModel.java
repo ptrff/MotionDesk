@@ -42,7 +42,7 @@ public class BrowseViewModel extends AndroidViewModel {
     public void init(int pos) {
         executor.execute(() -> {
             while (pos+5>itemsList.size()) {
-                itemsList.add(
+                /*itemsList.add(
                         new WallpaperItem(itemsList.size()+1, "Название обоев",
                                 "i_petroff",
                                 "description",
@@ -50,7 +50,7 @@ public class BrowseViewModel extends AndroidViewModel {
                                 "Для всех",
                                 "link"
                         )
-                );
+                );*/
             }
 
             while (pos+5>sectorsList.size()) {
@@ -69,7 +69,7 @@ public class BrowseViewModel extends AndroidViewModel {
     private void addFirst() {
         itemsList = new ArrayList<>();
         sectorsList = new ArrayList<>();
-        itemsList.add(
+        /*itemsList.add(
                 new WallpaperItem(itemsList.size()+1, "Название обоев",
                         "i_petroff",
                         "description",
@@ -77,7 +77,7 @@ public class BrowseViewModel extends AndroidViewModel {
                         "Для всех",
                         "link"
                 )
-        );
+        );*/
         sectorsList.add(
                 new BrowseSector("Реки емае",
                         null,

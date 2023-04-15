@@ -18,7 +18,13 @@ public class GlitchEffect extends BaseEffect {
     private float time = 0f;
 
     public GlitchEffect(String name) {
-        super(VfxGLUtils.compileShader(Gdx.files.classpath("gdxvfx/shaders/screenspace.vert"), Gdx.files.internal("shaders/test.frag")));
+        super(
+                VfxGLUtils.compileShader(
+                        Gdx.files.classpath("gdxvfx/shaders/screenspace.vert"),
+                        Gdx.files.internal("shaders/test.frag")
+                ),
+                "GlitchEffect"
+        );
         this.name = name;
         rebind();
     }

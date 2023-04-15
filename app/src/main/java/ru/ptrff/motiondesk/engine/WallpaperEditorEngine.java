@@ -2,27 +2,46 @@ package ru.ptrff.motiondesk.engine;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
+import android.provider.MediaStore;
+import android.util.Log;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.google.gson.JsonObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.concurrent.Callable;
+
+import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 import ru.ptrff.motiondesk.R;
+import ru.ptrff.motiondesk.utils.JSONFormatter;
+import ru.ptrff.motiondesk.utils.ProjectManager;
+import ru.ptrff.motiondesk.utils.ZipMaster;
 
 public class WallpaperEditorEngine extends Group implements Screen, GestureDetector.GestureListener {
 
@@ -95,7 +114,7 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
         Texture texture = new Texture(imagePath);
         ImageActor image = new ImageActor(texture, "fdsf" + stage.getActors().size);
         ActorHandler actorHandler = new ActorHandler(image);
-        //actorHandler.addEffect(new ShakeEffect("Effect name", new Texture("mask.png")));
+        actorHandler.addEffect(new GlitchEffect("EffectiveName"+stage.getActors().size));
         return actorHandler;
     }
 
@@ -163,11 +182,20 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
 
     public void addImage(Bitmap bitmap) {
         Gdx.app.postRunnable(() -> {
-            Texture texture = new Texture(bitmap.getWidth(), bitmap.getHeight(), Pixmap.Format.RGBA8888);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture.getTextureObjectHandle());
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
-            bitmap.recycle();
+//            Texture texture = new Texture(bitmap.getWidth(), bitmap.getHeight(), Pixmap.Format.RGBA8888);
+//            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture.getTextureObjectHandle());
+//            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+//            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+//            bitmap.recycle();
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            Pixmap pixmap = new Pixmap(byteArray, 0, byteArray.length);
+
+            Texture texture = new Texture(new PixmapTextureData(pixmap, pixmap.getFormat(), false, false));
+            //pixmap.dispose();
+
             ImageActor image = new ImageActor(texture, resources.getString(R.string.new_layer) + " " + stage.getActors().size);
             ActorHandler actorHandler = new ActorHandler(image);
 
@@ -437,5 +465,16 @@ public class WallpaperEditorEngine extends Group implements Screen, GestureDetec
     @Override
     public void pinchStop() {
 
+    }
+
+    public ZipMaster getZipMaster(){
+        ZipMaster zipMaster = new ZipMaster();
+        for (int i = 0;i<getStageActorArray().size;i++)
+            zipMaster.addTexture(getStageActorArray().get(i).getImageActor().getTexture());
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.add("general", null);
+        jsonObject.add("objects", JSONFormatter.actorsToJsonArray(getStageActorArray()));
+        zipMaster.setSceneJson(jsonObject);
+        return zipMaster;
     }
 }

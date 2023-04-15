@@ -65,7 +65,7 @@ public class BrowseSectorAdapter extends RecyclerView.Adapter<BrowseSectorAdapte
                     Toast.makeText(activity, "overscrolled " + (position + 1), Toast.LENGTH_SHORT).show();
                 });
 
-                adapter = new WpprsAdapter(item.getItemList(), null, activity);
+//                adapter = new WpprsAdapter(item.getItemList(), null, activity);
 
                 applyManagerToAdapter(adapter, holder.binding.recycler);
                 holder.binding.recycler.post(() -> applyItemsSize(holder.binding.recycler));

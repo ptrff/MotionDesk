@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Theme.MotionDesk"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="15dp">
+
+    <LinearLayout
+        android:id="@+id/label_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/right_top_rounded"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_parameters"
+            app:tint="?foregroundBlackWhite" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:textColor="?foregroundBlackWhite"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ru.ptrff.motiondesk.view.ShimmerView
+            android:id="@+id/loading_indicator"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            app:shimmerAnimationDuration="1500"
+            app:shimmerColor="?colorAccent"
+            app:shimmerColorBackground="?backgroundBlackWhite"
+            android:layout_centerInParent="true"
+            app:shimmerRadius="20px" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/position_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal"
+                android:visibility="invisible">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="7dp"
+                    android:layout_weight="1"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="@dimen/card_corners"
+                    app:boxCornerRadiusBottomStart="@dimen/card_corners"
+                    app:boxCornerRadiusTopEnd="@dimen/card_corners"
+                    app:boxCornerRadiusTopStart="@dimen/card_corners">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/x"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:backgroundTint="?backgroundBlackWhite"
+                        android:hint="@string/x"
+                        android:imeOptions="actionDone"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="7dp"
+                    android:layout_weight="1"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="@dimen/card_corners"
+                    app:boxCornerRadiusBottomStart="@dimen/card_corners"
+                    app:boxCornerRadiusTopEnd="@dimen/card_corners"
+                    app:boxCornerRadiusTopStart="@dimen/card_corners">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/y"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:backgroundTint="?backgroundBlackWhite"
+                        android:hint="@string/y"
+                        android:imeOptions="actionDone"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/scale_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal"
+                android:visibility="invisible">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="7dp"
+                    android:layout_weight="1"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="@dimen/card_corners"
+                    app:boxCornerRadiusBottomStart="@dimen/card_corners"
+                    app:boxCornerRadiusTopEnd="@dimen/card_corners"
+                    app:boxCornerRadiusTopStart="@dimen/card_corners">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/scaleX"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:backgroundTint="?backgroundBlackWhite"
+                        android:hint="@string/height"
+                        android:imeOptions="actionDone"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="7dp"
+                    android:layout_weight="1"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="@dimen/card_corners"
+                    app:boxCornerRadiusBottomStart="@dimen/card_corners"
+                    app:boxCornerRadiusTopEnd="@dimen/card_corners"
+                    app:boxCornerRadiusTopStart="@dimen/card_corners">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/scaleY"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:backgroundTint="?backgroundBlackWhite"
+                        android:hint="@string/width"
+                        android:imeOptions="actionDone"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/rotation_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:orientation="horizontal"
+                android:visibility="invisible">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="7dp"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="@dimen/card_corners"
+                    app:boxCornerRadiusBottomStart="@dimen/card_corners"
+                    app:boxCornerRadiusTopEnd="@dimen/card_corners"
+                    app:boxCornerRadiusTopStart="@dimen/card_corners">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/rotation"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:backgroundTint="?backgroundBlackWhite"
+                        android:hint="@string/rotation"
+                        android:imeOptions="actionDone"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/buttons_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="invisible">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_outline_button"
+                    android:textAllCaps="false"
+                    android:textColor="?colorAccent"
+                    android:textSize="16sp"
+                    app:backgroundTint="?colorAccent"
+                    app:cornerRadius="@dimen/card_corners"
+                    tools:text="button action" />
+
+                <Space
+                    android:id="@+id/buttons_space"
+                    android:layout_width="15dp"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_outline_button"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:textAllCaps="false"
+                    android:textColor="?colorAccent"
+                    android:textSize="16sp"
+                    app:backgroundTint="?colorAccent"
+                    app:cornerRadius="@dimen/card_corners"
+                    tools:text="button action" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+</LinearLayout>

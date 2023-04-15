@@ -8,29 +8,17 @@ import android.view.View;
 import android.widget.ImageView;
 
 public class ImageMatrixTouchHandler implements View.OnTouchListener {
-    private static final String TAG = "ImageMatrixTouchHandler";
-
-    // These matrices will be used to scale points of the image
     private final Matrix matrix = new Matrix();
     private final Matrix savedMatrix = new Matrix();
 
-    // The 3 states (events) which the user is trying to perform
     private static final int NONE = 0;
     private static final int DRAG = 1;
     private static final int ZOOM = 2;
     private int mode = NONE;
 
-    // these PointF objects are used to record the point(s) the user is touching
     private final PointF start = new PointF();
     private final PointF mid = new PointF();
     private float oldDist = 1f;
-
-    private final Context mContext;
-
-    public ImageMatrixTouchHandler(Context context) {
-        super();
-        this.mContext = context;
-    }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -71,18 +59,14 @@ public class ImageMatrixTouchHandler implements View.OnTouchListener {
         return true;
     }
 
-    /**
-     * Determine the space between the first two fingers
-     */
+    // Determine the space between the first two fingers
     private float spacing(MotionEvent event) {
         float x = event.getX(0) - event.getX(1);
         float y = event.getY(0) - event.getY(1);
         return (float) Math.sqrt(x * x + y * y);
     }
 
-    /**
-     * Calculate the mid point of the first two fingers
-     */
+    // Calculate the mid point of the first two fingers
     private void midPoint(PointF point, MotionEvent event) {
         float x = event.getX(0) + event.getX(1);
         float y = event.getY(0) + event.getY(1);

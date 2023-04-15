@@ -1,5 +1,6 @@
 package ru.ptrff.motiondesk.view;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -31,19 +32,20 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import java.io.File;
+import java.util.List;
+
+import io.reactivex.Observable;
 import io.reactivex.Observer;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import ru.ptrff.motiondesk.data.Project;
-import ru.ptrff.motiondesk.data.ProjectDB;
-import ru.ptrff.motiondesk.data.ProjectDao;
 import ru.ptrff.motiondesk.utils.Converter;
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.data.WallpaperItem;
 import ru.ptrff.motiondesk.databinding.FragmentLibBinding;
 import ru.ptrff.motiondesk.adapters.WpprsAdapter;
+import ru.ptrff.motiondesk.utils.ProjectManager;
 import ru.ptrff.motiondesk.viewmodel.LibViewModel;
 
 
@@ -56,14 +58,17 @@ public class LibFragment extends Fragment {
     private WpprsAdapter adapter;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {super.onCreate(savedInstanceState);}
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        viewModel = new ViewModelProvider(this).get(LibViewModel.class);
+        adapter = new WpprsAdapter(itemClick, getActivity());
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentLibBinding.inflate(inflater);
-        viewModel = new ViewModelProvider(this).get(LibViewModel.class);
-        adapter = new WpprsAdapter(viewModel.getItemsLiveData().getValue(), itemClick, itemLongClickListener,  getActivity());
         binding.libRecycler.setHasFixedSize(true);
         binding.libRecycler.setItemViewCacheSize(0);
 
@@ -71,69 +76,40 @@ public class LibFragment extends Fragment {
         setupActionBarButtons();
         setupPullToRefresh();
         observeContent();
-        generateWhileScrolling();
-
-
-        viewModel.init(15);
-
-
-        ProjectDB projectDB = ProjectDB.getInstance(requireContext());
-        ProjectDao projectDao = projectDB.projectDao();
-
-        projectDao.addProject(new Project("NAmee", "dedededede", 5.8f))
-                .subscribeOn(Schedulers.io())
-                .subscribe(() -> {});
-        projectDao.getProject(0)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Project>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(Project project) {
-                        Log.d("MYLOG", project.toString());
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
 
         return binding.getRoot();
     }
 
-    private void generateWhileScrolling() {
+    @Override
+    public void onResume() {
+        super.onResume();
+        viewModel.refresh();
+    }
+
+    /*private void generateWhileScrolling() {
         binding.libRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 if(sGrid.findFirstVisibleItemPosition()!=viewModel.getScrollPosition().getValue()){
-                    viewModel.init(sGrid.findLastVisibleItemPosition());
+                    viewModel.init(); //sGrid.findLastVisibleItemPosition()
                 }
             }
         });
-    }
-
+    }*/
 
     private void observeContent(){
         viewModel.getItemsLiveData().observe(getViewLifecycleOwner(), wallpaperItems -> {
-            adapter.notifyItemInserted(wallpaperItems.size());
+            adapter.submitList(null);
+            adapter.submitList(wallpaperItems);
+            //binding.libRecycler.setAdapter(adapter);
         });
     }
 
     private void setupPullToRefresh() {
-        final SwipeRefreshLayout pullToRefresh = binding.libRefresh;
-        pullToRefresh.setOnRefreshListener(() -> {
-            pullToRefresh.setRefreshing(false);
+        binding.libRefresh.setOnRefreshListener(() -> {
+            viewModel.refresh();
+            binding.libRefresh.setRefreshing(false);
         });
     }
 
@@ -148,7 +124,6 @@ public class LibFragment extends Fragment {
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 CreateProjectFragment configureProject = new CreateProjectFragment();
                 configureProject.show(requireActivity().getSupportFragmentManager(), "New project");
-
                 return false;
             }
         };
@@ -179,75 +154,10 @@ public class LibFragment extends Fragment {
         applyGridToAdapter();
     }
 
-    public OnItemLongClickListener itemLongClickListener = (item, position) -> {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        TypedValue typedValue = new TypedValue();
-        Resources.Theme theme = requireContext().getTheme();
-
-        LinearLayout dialogLayout = new LinearLayout(getContext());
-        dialogLayout.setOrientation(LinearLayout.VERTICAL);
-        dialogLayout.setGravity(Gravity.CENTER);
-        dialogLayout.setPadding(Converter.dpToPx(15), Converter.dpToPx(15), Converter.dpToPx(15), Converter.dpToPx(15));
-
-        theme.resolveAttribute(R.attr.foregroundBlackWhite, typedValue, true);
-        TextView title = new TextView(getContext());
-        title.setText("Выберите действие:");
-        title.setTextColor(typedValue.data);
-        title.setTextSize(16);
-        title.setPadding(0, 0, 0, Converter.dpToPx(15));
-        dialogLayout.addView(title);
-
-        LinearLayout buttonsLayout = new LinearLayout(getContext());
-        buttonsLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-
-        theme.resolveAttribute(androidx.appcompat.R.attr.colorAccent, typedValue, true);
-
-        ImageButton button = new ImageButton(getContext());
-        button.setImageResource(R.drawable.ic_image);
-        button.setImageTintList(ColorStateList.valueOf(typedValue.data));
-        button.setBackgroundResource(R.drawable.rounded_outline_button);
-        button.setBackgroundTintList(ColorStateList.valueOf(typedValue.data));
-        LinearLayout.LayoutParams v = new LinearLayout.LayoutParams(Converter.dpToPx(50), Converter.dpToPx(50));
-        v.setMargins(0, 0, Converter.dpToPx(15), 0);
-        button.setLayoutParams(v);
-        buttonsLayout.addView(button);
-
-        button = new ImageButton(getContext());
-        button.setImageResource(R.drawable.ic_star);
-        button.setImageTintList(ColorStateList.valueOf(typedValue.data));
-        button.setBackgroundResource(R.drawable.rounded_outline_button);
-        button.setBackgroundTintList(ColorStateList.valueOf(typedValue.data));
-        button.setLayoutParams(v);
-        buttonsLayout.addView(button);
-
-        button = new ImageButton(getContext());
-        button.setImageResource(R.drawable.ic_delete);
-        button.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.red, theme)));
-        button.setBackgroundResource(R.drawable.rounded_outline_button);
-        button.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.red, theme)));
-        button.setLayoutParams(v);
-        buttonsLayout.addView(button);
-
-        dialogLayout.addView(buttonsLayout);
-        builder.setView(dialogLayout);
-
-        AlertDialog dialog = builder.create();
-        dialog.getWindow().setBackgroundDrawableResource(R.drawable.rounded_bottom_dialog);
-        dialog.show();
-    };
-
     public OnItemClickListener itemClick = (item, position) -> {
-        InfoFragment infoFragment = new InfoFragment();
-        infoFragment.setAuthor(item.getAuthor());
-        infoFragment.setName(item.getName());
-        infoFragment.setDescription(item.getDescription());
-        infoFragment.setStars(item.getStars());
-        infoFragment.setRating(item.getRating());
-        //infoFragment.setPreviewBitmap(item.getImage());
-        infoFragment.setButtonOnClickListener(view -> {
-            startPreview(item);
-        });
+        InfoFragmentEvents events = () -> viewModel.refresh(); //TODO removing & updating
+        InfoFragment infoFragment = new InfoFragment(item, events);
+        infoFragment.setButtonOnClickListener(view -> startPreview(item));
         infoFragment.show(requireActivity().getSupportFragmentManager(), "Info");
     };
 

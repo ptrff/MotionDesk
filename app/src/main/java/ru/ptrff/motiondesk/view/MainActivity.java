@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         addBottomNavigationHiding();
 
-        if(true){
+        if(false){
             binding.appbar.setExpanded(false);
             authFragment = new AuthFragment(setupAuthCloser());
             showAuthPage();

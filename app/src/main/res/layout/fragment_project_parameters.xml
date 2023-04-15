@@ -68,25 +68,38 @@
                     android:layout_marginBottom="15dp"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/name"
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:ellipsize="end"
-                        android:maxLines="4"
-                        android:text="A little name"
-                        android:textColor="?foregroundBlackWhite" />
+                        app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusBottomEnd="@dimen/card_corners"
+                        app:boxCornerRadiusBottomStart="@dimen/card_corners"
+                        app:boxCornerRadiusTopEnd="@dimen/card_corners"
+                        app:boxCornerRadiusTopStart="@dimen/card_corners">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/name"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:backgroundTint="?backgroundBlackWhite"
+                            android:hint="@string/name"
+                            android:imeOptions="actionNext"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:textColor="?foregroundBlackWhite" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <TextView
                         android:id="@+id/author"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:alpha="0.8"
                         android:text="i_petroff"
                         android:textColor="?foregroundBlackWhite"
-                        android:alpha="0.8"
-                        android:textSize="12sp" />
+                        android:textSize="14sp" />
 
                     <Space
                         android:layout_width="wrap_content"
@@ -96,38 +109,12 @@
                     <com.google.android.flexbox.FlexboxLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="2dp"
                         android:gravity="center"
                         android:orientation="vertical"
                         app:alignContent="stretch"
                         app:alignItems="stretch"
-                        android:layout_marginBottom="2dp"
                         app:flexWrap="wrap">
-
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:layout_marginEnd="15dp"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_weight="0"
-                                android:src="@drawable/ic_star"
-                                app:tint="?colorAccent" />
-
-                            <TextView
-                                android:id="@+id/stars"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:layout_marginStart="5dp"
-                                android:text="8.5"
-                                android:textColor="?colorAccent"
-                                android:textSize="12sp" />
-                        </LinearLayout>
 
 
                         <LinearLayout
@@ -146,8 +133,8 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
-                                android:gravity="center"
                                 android:layout_marginStart="5dp"
+                                android:gravity="center"
                                 android:text="1920 x 1080"
                                 android:textColor="?colorAccent"
                                 android:textSize="12sp" />
@@ -157,33 +144,8 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
                             android:layout_marginEnd="15dp"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_weight="0"
-                                android:src="@drawable/ic_memory"
-                                app:tint="?colorAccent" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:layout_marginStart="5dp"
-                                android:text="8 Мб"
-                                android:textColor="?colorAccent"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:gravity="center_vertical"
-                            android:layout_marginEnd="15dp"
                             android:orientation="horizontal">
 
                             <ImageView
@@ -197,33 +159,9 @@
                                 android:id="@+id/rating"
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
-                                android:gravity="center"
                                 android:layout_marginStart="5dp"
+                                android:gravity="center"
                                 android:text="18+"
-                                android:textColor="?colorAccent"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_weight="0"
-                                android:src="@drawable/ic_download"
-                                app:tint="?colorAccent" />
-
-                            <TextView
-                                android:id="@+id/downloads"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:layout_marginStart="5dp"
-                                android:text="495k"
                                 android:textColor="?colorAccent"
                                 android:textSize="12sp" />
                         </LinearLayout>
@@ -279,49 +217,43 @@
                     app:alignItems="stretch"
                     app:flexWrap="wrap">
 
+                    <ImageButton
+                        android:id="@+id/add_tag"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginEnd="15dp"
+                        android:background="@drawable/rounded_outline_button"
+                        android:backgroundTint="?colorPrimaryVariant"
+                        android:src="@drawable/ic_add"
+                        app:tint="?colorPrimaryVariant" />
 
                 </com.google.android.flexbox.FlexboxLayout>
 
-                <LinearLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="15dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_weight="0"
-                        android:src="@drawable/ic_description"
-                        app:tint="?colorPrimaryVariant" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Описание:"
-                        android:textColor="?colorPrimaryVariant" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="2dp"
                     android:layout_marginEnd="15dp"
-                    android:layout_marginBottom="2dp"
-                    android:background="?colorPrimaryVariant" />
-
-                <TextView
-                    android:id="@+id/description"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_weight="1"
-                    android:textColor="?foregroundBlackWhite" />
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="@dimen/card_corners"
+                    app:boxCornerRadiusBottomStart="@dimen/card_corners"
+                    app:boxCornerRadiusTopEnd="@dimen/card_corners"
+                    app:boxCornerRadiusTopStart="@dimen/card_corners">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/description"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:backgroundTint="?backgroundBlackWhite"
+                        android:hint="@string/description"
+                        android:imeOptions="actionNext"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textColor="?foregroundBlackWhite" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
             </LinearLayout>
 
             <LinearLayout
@@ -330,48 +262,35 @@
                 android:layout_margin="15dp"
                 android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/delete"
-                    android:layout_width="50dp"
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/cancel"
+                    android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginEnd="15dp"
+                    android:layout_weight="1"
                     android:background="@drawable/rounded_outline_button"
                     android:backgroundTint="@color/red"
-                    android:src="@drawable/ic_delete"
-                    app:tint="@color/red" />
+                    android:text="@string/cancel"
+                    android:textColor="@color/red" />
+
+                <Space
+                    android:id="@+id/buttons_space"
+                    android:layout_width="15dp"
+                    android:layout_height="wrap_content" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/apply"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginEnd="15dp"
                     android:layout_weight="1"
                     android:background="@drawable/rounded_outline_button"
                     android:backgroundTint="?colorAccent"
-                    android:text="Применить"
+                    android:text="@string/save"
                     android:textColor="?colorAccent" />
 
-                <ImageButton
-                    android:id="@+id/rate"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginEnd="15dp"
-                    android:background="@drawable/rounded_outline_button"
-                    android:backgroundTint="?bottomNavBarNotChecked"
-                    android:src="@drawable/ic_star"
-                    app:tint="?bottomNavBarNotChecked" />
-
-                <ImageButton
-                    android:id="@+id/edit"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:background="@drawable/rounded_outline_button"
-                    android:backgroundTint="?colorSecondary"
-                    android:src="@drawable/ic_edit"
-                    app:tint="?colorSecondary" />
-
             </LinearLayout>
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+
 </FrameLayout>

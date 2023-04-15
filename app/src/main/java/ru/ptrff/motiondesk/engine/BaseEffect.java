@@ -7,9 +7,11 @@ import com.crashinvaders.vfx.effects.ShaderVfxEffect;
 public abstract class BaseEffect extends ShaderVfxEffect implements ChainVfxEffect {
 
     protected String name;
+    private final String type;
 
-    public BaseEffect(ShaderProgram program) {
+    public BaseEffect(ShaderProgram program, String type) {
         super(program);
+        this.type = type;
     }
 
     public void setName(String name) {
@@ -18,5 +20,9 @@ public abstract class BaseEffect extends ShaderVfxEffect implements ChainVfxEffe
 
     public String getName() {
         return name;
+    }
+
+    public String getType() {
+        return type;
     }
 }

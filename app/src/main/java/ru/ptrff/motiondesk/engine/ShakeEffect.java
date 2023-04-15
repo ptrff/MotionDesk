@@ -21,13 +21,25 @@ public class ShakeEffect extends BaseEffect {
     private float time = 0f;
 
     public ShakeEffect(String name) {
-        super(VfxGLUtils.compileShader(Gdx.files.classpath("gdxvfx/shaders/screenspace.vert"), Gdx.files.internal("shaders/ShakeShader.frag")));
+        super(
+                VfxGLUtils.compileShader(
+                        Gdx.files.classpath("gdxvfx/shaders/screenspace.vert"),
+                        Gdx.files.internal("shaders/ShakeShader.frag")
+                ),
+                "ShakeEffect"
+        );
         this.name = name;
         rebind();
     }
 
     public ShakeEffect(String name, Texture mask) {
-        super(VfxGLUtils.compileShader(Gdx.files.classpath("gdxvfx/shaders/screenspace.vert"), Gdx.files.internal("shaders/ShakeShader.frag")));
+        super(
+                VfxGLUtils.compileShader(
+                        Gdx.files.classpath("gdxvfx/shaders/screenspace.vert"),
+                        Gdx.files.internal("shaders/ShakeShader.frag")
+                ),
+                "ShakeEffect"
+        );
         this.name = name;
         this.mask = mask;
         maskEnabled = true;

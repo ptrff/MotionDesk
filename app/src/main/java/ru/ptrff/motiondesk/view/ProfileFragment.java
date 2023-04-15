@@ -47,7 +47,7 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater);
         viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        adapter = new WpprsAdapter(viewModel.getItemsLiveData().getValue(), itemClick, getActivity());
+        adapter = new WpprsAdapter(itemClick, getActivity());
         binding.profileRecycler.setHasFixedSize(true);
         binding.profileRecycler.setItemViewCacheSize(0);
 
@@ -138,11 +138,7 @@ public class ProfileFragment extends Fragment {
     }
 
     public OnItemClickListener itemClick = (item, position) -> {
-        InfoFragment infoFragment = new InfoFragment();
-        infoFragment.setAuthor(item.getAuthor());
-        infoFragment.setDescription(item.getDescription());
-        infoFragment.setRating(item.getRating());
-        //infoFragment.setPreviewBitmap(item.getImage());
+        InfoFragment infoFragment = new InfoFragment(item, null);
         infoFragment.setButtonOnClickListener(view -> {
             startPreview(item);
         });

@@ -1,17 +1,17 @@
 package ru.ptrff.motiondesk.view;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 
 import android.transition.Explode;
 import android.util.TypedValue;
@@ -29,23 +29,23 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.File;
 
 import ru.ptrff.motiondesk.R;
+import ru.ptrff.motiondesk.data.WallpaperItem;
 import ru.ptrff.motiondesk.databinding.FragmentInfoBinding;
+import ru.ptrff.motiondesk.utils.ProjectManager;
 
 public class InfoFragment extends BottomSheetDialogFragment {
     private FragmentInfoBinding binding;
-    private String author;
-    private String name;
-    private String description;
-    private String rating;
-    private float stars;
+    private final WallpaperItem item;
     private View.OnClickListener click;
-    private final List<String> tags = new ArrayList<>();
+    private final InfoFragmentEvents events;
 
+    public InfoFragment(WallpaperItem item, InfoFragmentEvents events){
+        this.item = item;
+        this.events = events;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,8 +63,11 @@ public class InfoFragment extends BottomSheetDialogFragment {
         return binding.getRoot();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void bindData() {
-        Picasso.get().load(R.drawable.preview).into(new Target() {
+        String image = item.getImage();
+        if(image.equals("")) image = Uri.parse("android.resource://ru.ptrff.motiondesk/drawable/image_name").toString();
+        Picasso.get().load(image).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 binding.backrgoundImage.setImageBitmap(bitmap);
@@ -85,9 +88,8 @@ public class InfoFragment extends BottomSheetDialogFragment {
 
         binding.edit.setOnClickListener(view -> {
             Intent i = new Intent(getActivity(), WallpaperEditor.class);
-            i.putExtra("Name", name);
-            i.putExtra("Width", 1080);
-            i.putExtra("Height", 1920);
+            i.putExtra("new_project", false);
+            i.putExtra("wallpaper_item", item);
             requireActivity().getWindow().setExitTransition(new Explode());
             startActivity(i);
         });
@@ -113,7 +115,7 @@ public class InfoFragment extends BottomSheetDialogFragment {
             final ImageView imageView = new ImageView(getContext());
             imageView.setImageDrawable(((ImageView)view).getDrawable());
             imageView.setScaleType(ImageView.ScaleType.MATRIX);
-            imageView.setOnTouchListener(new ImageMatrixTouchHandler(getContext()));
+            imageView.setOnTouchListener(new ImageMatrixTouchHandler());
             builder.setView(imageView);
 
             builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
@@ -128,7 +130,13 @@ public class InfoFragment extends BottomSheetDialogFragment {
             builder.setTitle("Удалить обои?");
             builder.setMessage("Вы действительно хотите удалить эти обои?");
 
-            builder.setPositiveButton("Да", (dialog, which) -> dialog.dismiss());
+            builder.setPositiveButton("Да", (dialog, which) -> {
+                ProjectManager.removeProject(new File(
+                        ProjectManager.getProjectsDirectory(requireContext()).getPath()+"/"+item.getName()));
+                dialog.dismiss();
+                events.onWallpaperRemoved();
+                dismiss();
+            });
             builder.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
 
             AlertDialog dialog = builder.create();
@@ -138,11 +146,11 @@ public class InfoFragment extends BottomSheetDialogFragment {
     }
 
     private void fillTextData(){
-        binding.name.setText(name);
-        binding.author.setText(author);
-        binding.description.setText(description);
-        binding.stars.setText(String.valueOf(stars));
-        binding.rating.setText(rating);
+        binding.name.setText(item.getName());
+        binding.author.setText(item.getAuthor());
+        binding.description.setText(item.getDescription());
+        binding.stars.setText(String.valueOf(item.getStars()));
+        binding.rating.setText(item.getRating());
         binding.apply.setOnClickListener(click);
 
         TypedValue typedValue = new TypedValue();
@@ -153,17 +161,7 @@ public class InfoFragment extends BottomSheetDialogFragment {
     }
 
     private void fillTags(){
-        tags.add("1920x1080");
-        tags.add("Anime");
-        tags.add("Evangelion");
-        tags.add("Asuka");
-        tags.add("Misato");
-        tags.add("Animated");
-        tags.add("Art");
-
-        Collections.sort(tags);
-
-        for(String tag:tags){
+        for(String tag:item.getTags()){
             TypedValue typedValue = new TypedValue();
             Resources.Theme theme = requireContext().getTheme();
             TextView tagView = new TextView(getContext());
@@ -194,28 +192,9 @@ public class InfoFragment extends BottomSheetDialogFragment {
         return dialog;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setStars(float stars) {
-        this.stars = stars;
-    }
-
-    public void setRating(String rating){
-        this.rating = rating;
-    }
-
     public void setButtonOnClickListener(View.OnClickListener listener) {
         click = listener;
     }
+
 }
 

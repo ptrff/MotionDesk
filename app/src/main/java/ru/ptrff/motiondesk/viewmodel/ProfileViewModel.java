@@ -38,7 +38,7 @@ public class ProfileViewModel extends AndroidViewModel {
     public void init(int pos) {
         executor.execute(() -> {
             while (pos+8>itemsList.size()) {
-                itemsList.add(
+                /*itemsList.add(
                         new WallpaperItem(itemsList.size()+1, "Название обоев",
                                 "i_petroff",
                                 "description",
@@ -46,7 +46,7 @@ public class ProfileViewModel extends AndroidViewModel {
                                 "Для всех",
                                 "link"
                         )
-                );
+                );*/
                 itemsLiveData.postValue(itemsList);
             }
         });
@@ -54,7 +54,7 @@ public class ProfileViewModel extends AndroidViewModel {
 
     private void addFirst() {
         itemsList = new ArrayList<>();
-        itemsList.add(
+        /*itemsList.add(
                 new WallpaperItem(itemsList.size()+1, "Название обоев",
                         "i_petroff",
                         "description",
@@ -62,7 +62,7 @@ public class ProfileViewModel extends AndroidViewModel {
                         "Для всех",
                         "link"
                 )
-        );
+        );*/
         itemsLiveData.setValue(itemsList);
     }
 
