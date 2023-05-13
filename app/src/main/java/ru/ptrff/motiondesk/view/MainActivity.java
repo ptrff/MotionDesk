@@ -32,13 +32,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        try {
-            setSupportActionBar(binding.toolbar);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        setSupportActionBar(binding.toolbar);
 
-        new Converter(this);
+        new Converter(getResources().getDisplayMetrics().density);
 
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 

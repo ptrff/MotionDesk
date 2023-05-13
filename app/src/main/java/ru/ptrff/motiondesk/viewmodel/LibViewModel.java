@@ -7,59 +7,59 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.gson.Gson;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import ru.ptrff.motiondesk.data.WallpaperItem;
-import ru.ptrff.motiondesk.utils.ProjectManager;
+import ru.ptrff.motiondesk.data.local.WallpaperItemRepository;
+import ru.ptrff.motiondesk.models.WallpaperItem;
 
 public class LibViewModel extends AndroidViewModel {
 
-    private final MutableLiveData<List<WallpaperItem>> itemsLiveData;
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final MutableLiveData<List<WallpaperItem>> wallpaperItemsLiveData;
     private final MutableLiveData<Integer> scrollPosition;
-    private final List<WallpaperItem> itemList;
+    private final WallpaperItemRepository repo;
 
+    @SuppressLint("CheckResult")
     public LibViewModel(@NonNull Application application) {
         super(application);
-        itemsLiveData = new MutableLiveData<>();
+        wallpaperItemsLiveData = new MutableLiveData<>();
+
+        repo = new WallpaperItemRepository(application);
+
+        repo
+                .getAllWallpaperItems()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(wallpaperItems -> {
+                    wallpaperItemsLiveData.postValue(wallpaperItems);
+                });
+
         scrollPosition = new MutableLiveData<>();
-        itemList = new ArrayList<>();
         scrollPosition.setValue(0);
     }
 
-    public MutableLiveData<List<WallpaperItem>> getItemsLiveData() {
-        return itemsLiveData;
-    }
-
-    @SuppressLint("CheckResult")
-    public void init() {
-        Observable
-                .just(ProjectManager.getProjectFiles(getApplication().getApplicationContext()))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(projectFiles -> {
-                    Gson gson = new Gson();
-                    for (File project : projectFiles) {
-                        try {
-                            itemList.add(gson.fromJson(ProjectManager.getWallpaperItemJsonString(project), WallpaperItem.class));
-                        } catch (IOException ignored) {
-                        }
-                    }
-                    itemsLiveData.postValue(itemList);
-                });
+    public MutableLiveData<List<WallpaperItem>> getWallpaperItemsLiveData() {
+        return wallpaperItemsLiveData;
     }
 
     public void refresh() {
-        itemList.clear();
-        itemsLiveData.postValue(itemList);
-        init();
+        Disposable disposable = repo.getAllWallpaperItems()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(wallpaperItemsLiveData::postValue);
+
+        compositeDisposable.add(disposable);
+    }
+
+    @Override
+    protected void onCleared() {
+        compositeDisposable.clear();
+        super.onCleared();
     }
 
     public MutableLiveData<Integer> getScrollPosition() {

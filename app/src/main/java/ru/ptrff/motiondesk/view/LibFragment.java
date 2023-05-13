@@ -1,27 +1,21 @@
 package ru.ptrff.motiondesk.view;
 
-import android.app.Activity;
-import android.app.AlertDialog;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.transition.Explode;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.MenuProvider;
@@ -29,20 +23,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import java.io.File;
-import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import ru.ptrff.motiondesk.utils.Converter;
 import ru.ptrff.motiondesk.R;
-import ru.ptrff.motiondesk.data.WallpaperItem;
+import ru.ptrff.motiondesk.models.WallpaperItem;
 import ru.ptrff.motiondesk.databinding.FragmentLibBinding;
 import ru.ptrff.motiondesk.adapters.WpprsAdapter;
 import ru.ptrff.motiondesk.utils.ProjectManager;
@@ -99,7 +85,7 @@ public class LibFragment extends Fragment {
     }*/
 
     private void observeContent(){
-        viewModel.getItemsLiveData().observe(getViewLifecycleOwner(), wallpaperItems -> {
+        viewModel.getWallpaperItemsLiveData().observe(getViewLifecycleOwner(), wallpaperItems -> {
             adapter.submitList(null);
             adapter.submitList(wallpaperItems);
             //binding.libRecycler.setAdapter(adapter);
@@ -161,10 +147,25 @@ public class LibFragment extends Fragment {
         infoFragment.show(requireActivity().getSupportFragmentManager(), "Info");
     };
 
+    @SuppressLint("CheckResult")
     private void startPreview(WallpaperItem item) {
-        Intent i = new Intent(getActivity(), WallpaperPreview.class);
-        i.putExtra("Name", item.getName());
-        requireActivity().getWindow().setExitTransition(new Explode());
-        startActivity(i);
+        Observable.fromCallable(() -> {
+                    ProjectManager.unpackProjectToCurrent(requireContext(), item.getId());
+                    SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MotionDesk", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("current", item.getId());
+                    editor.apply();
+                    return true;
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> {
+                    Intent intent = new Intent(requireActivity(), WallpaperPreview.class);
+                    intent.putExtra("wallpaper_item", item);
+                    requireActivity().getWindow().setExitTransition(new Explode());
+                    startActivity(intent);
+                }, error -> {
+                    Log.e("LibFragment", "Error starting preview", error);
+                });
     }
 }

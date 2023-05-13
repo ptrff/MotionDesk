@@ -9,6 +9,7 @@
     <attr name="halfTransparentBg" format="reference" />
 
     <declare-styleable name="ShimmerView">
+        <attr name="isCubic" format="boolean" />
         <attr name="shimmerColor" format="color" />
         <attr name="shimmerColorBackground" format="color" />
         <attr name="shimmerAnimationDuration" format="integer" />

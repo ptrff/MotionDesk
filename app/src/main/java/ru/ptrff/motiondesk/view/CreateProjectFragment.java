@@ -33,15 +33,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.databinding.FragmentCreateProjectBinding;
+import ru.ptrff.motiondesk.utils.Validation;
 
 public class CreateProjectFragment extends BottomSheetDialogFragment {
 
     private FragmentCreateProjectBinding binding;
     private boolean typeChecked = false;
     private boolean nameWritten = false;
-    private final boolean resolutionSet = false;
     private boolean animating = false;
-    private int typeNum;
     private String name;
     private int height;
     private int width;
@@ -98,7 +97,7 @@ public class CreateProjectFragment extends BottomSheetDialogFragment {
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 name = normalizeString(charSequence.toString());
                 binding.shortName.setText(name);
-                if (checkString(name)) {
+                if (Validation.checkString(name)) {
                     nameWritten = true;
                     recolorNext(true);
                     recolorEditText(binding.nameEdit, true);
@@ -172,7 +171,6 @@ public class CreateProjectFragment extends BottomSheetDialogFragment {
             binding.typeGif.setChecked(false);
             binding.typeWeb.setChecked(false);
             binding.shortType.setImageResource(R.drawable.ic_2d_square);
-            typeNum = 1;
             typeChecked = true;
             recolorNext(true);
         });
@@ -181,7 +179,6 @@ public class CreateProjectFragment extends BottomSheetDialogFragment {
             binding.typeGif.setChecked(true);
             binding.typeWeb.setChecked(false);
             binding.shortType.setImageResource(R.drawable.ic_image);
-            typeNum = 2;
             typeChecked = true;
             recolorNext(true);
         });
@@ -190,7 +187,6 @@ public class CreateProjectFragment extends BottomSheetDialogFragment {
             binding.typeGif.setChecked(false);
             binding.typeWeb.setChecked(true);
             binding.shortType.setImageResource(R.drawable.ic_code);
-            typeNum = 3;
             typeChecked = true;
             recolorNext(true);
         });
@@ -381,20 +377,6 @@ public class CreateProjectFragment extends BottomSheetDialogFragment {
         return input.trim().replaceAll("\\s+", " ");
     }
 
-    private boolean checkString(String input) {
-        int letterCount = 0;
-        int specialCharCount = 0;
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-            if (Character.isLetter(c)) {
-                letterCount++;
-            } else if (!Character.isDigit(c) && !Character.isWhitespace(c)) {
-                specialCharCount++;
-            }
-        }
-        return letterCount >=3 && input.length() <= 100 && specialCharCount <= 25;
-    }
-
     private void recolorNext(boolean state) {
         TypedValue typedValue = new TypedValue();
         Resources.Theme theme = requireContext().getTheme();
@@ -434,5 +416,9 @@ public class CreateProjectFragment extends BottomSheetDialogFragment {
             BottomSheetBehavior.from(bottomSheet).setPeekHeight(bottomSheet.getHeight());
         });
         return dialog;
+    }
+
+    private interface AnimationExecutor {
+        void execute(int value);
     }
 }

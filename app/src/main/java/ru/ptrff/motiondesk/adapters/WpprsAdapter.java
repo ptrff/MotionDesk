@@ -1,6 +1,6 @@
 package ru.ptrff.motiondesk.adapters;
 
-import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -18,24 +18,24 @@ import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import ru.ptrff.motiondesk.R;
-import ru.ptrff.motiondesk.data.WallpaperItem;
+import ru.ptrff.motiondesk.models.WallpaperItem;
 import ru.ptrff.motiondesk.databinding.ListItemBinding;
+import ru.ptrff.motiondesk.utils.ProjectManager;
 import ru.ptrff.motiondesk.view.OnItemClickListener;
 
 public class WpprsAdapter extends ListAdapter<WallpaperItem, WpprsAdapter.ViewHolder> {
 
     private final OnItemClickListener itemClickListener;
-    private final Activity activity;
+    private final Context context;
     private final Executor executor = Executors.newSingleThreadExecutor();
 
-    public WpprsAdapter(OnItemClickListener itemClickListener, Activity activity) {
+    public WpprsAdapter(OnItemClickListener itemClickListener, Context context) {
         super(new WallpaperItemDiffCallback());
-        this.activity = activity;
+        this.context = context;
         this.itemClickListener = itemClickListener;
     }
 
@@ -53,20 +53,24 @@ public class WpprsAdapter extends ListAdapter<WallpaperItem, WpprsAdapter.ViewHo
     }
 
     private void initViews(@NonNull ViewHolder holder, int position, WallpaperItem item) {
-        String image = item.getImage();
-        if (Objects.equals(image, ""))
-            holder.binding.backrgoundImage.setImageDrawable(activity.getDrawable(R.drawable.selectable_rounded_foreground));
-        else
-            Picasso.get().load(image).into(new Target() {
+
+        if (!item.hasPreviewImage()) {
+            holder.binding.backgroundImage.setImageDrawable(context.getDrawable(R.drawable.no_image));
+            holder.binding.shimmerView.setVisibility(View.GONE);
+        } else {
+            Picasso.get().load(ProjectManager.getPreviewById(context, item.getId())).into(new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    holder.binding.backrgoundImage.setImageBitmap(bitmap);
+                    holder.binding.backgroundImage.setImageBitmap(bitmap);
                     holder.binding.shimmerView.stopShimmerAnimation();
                     holder.binding.shimmerView.setVisibility(View.GONE);
                 }
 
                 @Override
                 public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                    holder.binding.backgroundImage.setImageDrawable(context.getDrawable(R.drawable.no_image));
+                    holder.binding.shimmerView.stopShimmerAnimation();
+                    holder.binding.shimmerView.setVisibility(View.GONE);
                 }
 
                 @Override
@@ -75,18 +79,13 @@ public class WpprsAdapter extends ListAdapter<WallpaperItem, WpprsAdapter.ViewHo
                     holder.binding.shimmerView.startShimmerAnimation();
                 }
             });
+        }
 
-        executor.execute(() -> {
-            activity.runOnUiThread(() -> {
-                holder.binding.name.setText(item.getName());
-                holder.binding.number.setText(item.getDescription());
-                holder.binding.allItem.setOnClickListener(view -> {
-                    itemClickListener.onItemClick(getItem(position), position);
-                });
-                holder.binding.stars.setText(String.valueOf(item.getStars()));
-                holder.binding.backrgoundImage.setVisibility(View.VISIBLE);
-            });
-        });
+
+        holder.binding.name.setText(item.getName());
+        holder.binding.number.setText(item.getDescription());
+        holder.binding.allItem.setOnClickListener(view -> itemClickListener.onItemClick(getItem(position), position));
+        holder.binding.stars.setText(String.valueOf(item.getStars()));
     }
 
     @Override

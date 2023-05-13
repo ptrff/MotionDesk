@@ -15,7 +15,7 @@
         android:id="@+id/preview_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="?backgroundBlackWhite"
+        android:backgroundTint="?backgroundDarkLight"
         android:clickable="false"
         android:elevation="0dp"
         android:focusable="true"
@@ -38,7 +38,7 @@
                 app:shimmerAnimationDuration="1500"/>
 
             <ImageView
-                android:id="@+id/backrgoundImage"
+                android:id="@+id/backgroundImage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:scaleType="centerCrop"

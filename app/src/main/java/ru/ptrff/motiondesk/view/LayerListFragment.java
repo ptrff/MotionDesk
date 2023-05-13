@@ -10,15 +10,10 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.utils.Array;
-
-import java.util.List;
-
 import ru.ptrff.motiondesk.adapters.LayerListAdapter;
 import ru.ptrff.motiondesk.databinding.FragmentEditorLayersBinding;
-import ru.ptrff.motiondesk.engine.ActorHandler;
-import ru.ptrff.motiondesk.engine.WallpaperEditorEngine;
+import ru.ptrff.motiondesk.engine.scene.ActorHandler;
+import ru.ptrff.motiondesk.engine.scene.WallpaperEditorEngine;
 
 public class LayerListFragment extends Fragment implements LayerListAdapter.LayerListeners{
 
@@ -27,7 +22,7 @@ public class LayerListFragment extends Fragment implements LayerListAdapter.Laye
     private FragmentEditorLayersBinding binding;
     private ItemTouchHelper touchHelper;
 
-    LayerListFragment(WallpaperEditorEngine engine){
+    public LayerListFragment(WallpaperEditorEngine engine){
         this.engine = engine;
     }
 
@@ -52,17 +47,21 @@ public class LayerListFragment extends Fragment implements LayerListAdapter.Laye
     }
 
     public void notifyItemInserted(int position){
-        adapter.notifyItemInserted(position);
+        if (adapter!=null) {
+            adapter.notifyItemInserted(position);
+        }
     }
 
     public void notifyItemRemoved(int position){
-        adapter.notifyItemRemoved(position);
-        adapter = new LayerListAdapter(engine.getStageActorArray(), this);
-        binding.layerList.setAdapter(adapter);
+        if(adapter!=null) {
+            adapter.notifyItemRemoved(position);
+            adapter = new LayerListAdapter(engine.getStageActorArray(), this);
+            binding.layerList.setAdapter(adapter);
 
-        ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
-        touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(binding.layerList);
+            ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
+            touchHelper = new ItemTouchHelper(callback);
+            touchHelper.attachToRecyclerView(binding.layerList);
+        }
     }
 
     @Override

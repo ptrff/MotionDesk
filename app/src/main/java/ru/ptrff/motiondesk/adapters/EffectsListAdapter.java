@@ -2,6 +2,8 @@ package ru.ptrff.motiondesk.adapters;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -14,17 +16,19 @@ import java.util.List;
 
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.databinding.LayerItemBinding;
-import ru.ptrff.motiondesk.engine.ActorHandler;
-import ru.ptrff.motiondesk.engine.BaseEffect;
+import ru.ptrff.motiondesk.engine.effects.BaseEffect;
+import ru.ptrff.motiondesk.engine.scene.ActorHandler;
 import ru.ptrff.motiondesk.view.ItemMoveCallback;
 
 public class EffectsListAdapter extends RecyclerView.Adapter<EffectsListAdapter.LayerItemHolder> implements ItemMoveCallback.ItemTouchHelperAdapter {
 
+    private final ActorHandler actor;
     private final List<BaseEffect> effects;
-    private final LayerListeners listeners;
+    private final EffectListeners listeners;
 
-    public EffectsListAdapter(List<BaseEffect> effects, LayerListeners listeners) {
-        this.effects = effects;
+    public EffectsListAdapter(ActorHandler actor, EffectListeners listeners) {
+        this.actor = actor;
+        this.effects = actor.getEffects();
         this.listeners = listeners;
     }
 
@@ -40,34 +44,31 @@ public class EffectsListAdapter extends RecyclerView.Adapter<EffectsListAdapter.
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onBindViewHolder(@NonNull LayerItemHolder holder, int position) {
+        holder.position.setText(position+".");
         holder.name.setText(effects.get(position).getName());
-//        holder.root.setOnClickListener(view -> {
-//            listeners.onLayerClick(objects.get(position));
-//        });
-//        holder.dragHandle.setOnTouchListener((v, event) -> {
-//            if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-//                listeners.onStartDrag(holder);
-//            }
-//            return true;
-//        });
-//        holder.lock.setOnClickListener(v -> {
-//            if(objects.get(position).getLockStatus()){
-//                holder.lock.setImageResource(R.drawable.ic_lock_open);
-//                objects.get(position).setLockStatus(false);
-//            }else{
-//                holder.lock.setImageResource(R.drawable.ic_lock_closed);
-//                objects.get(position).setLockStatus(true);
-//            }
-//        });
-//        holder.visibility.setOnClickListener(v -> {
-//            if(objects.get(position).getVisibility()){
-//                holder.visibility.setImageResource(R.drawable.ic_eye_closed);
-//                objects.get(position).setVisibility(false);
-//            }else{
-//                holder.visibility.setImageResource(R.drawable.ic_eye);
-//                objects.get(position).setVisibility(true);
-//            }
-//        });
+        holder.root.setOnClickListener(view -> {
+            listeners.onEffectClick(effects.get(position));
+        });
+        holder.dragHandle.setOnTouchListener((v, event) -> {
+            if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                listeners.onStartDrag(holder);
+            }
+            return true;
+        });
+        holder.lock.setVisibility(View.GONE);
+
+        holder.visibility.setImageResource(effects.get(position).isDisabled() ?
+                R.drawable.ic_eye_closed : R.drawable.ic_eye);
+
+        holder.visibility.setOnClickListener(v -> {
+            if (!effects.get(position).isDisabled()) {
+                holder.visibility.setImageResource(R.drawable.ic_eye_closed);
+                effects.get(position).setDisabled(true);
+            } else {
+                holder.visibility.setImageResource(R.drawable.ic_eye);
+                effects.get(position).setDisabled(false);
+            }
+        });
     }
 
     @Override
@@ -78,26 +79,26 @@ public class EffectsListAdapter extends RecyclerView.Adapter<EffectsListAdapter.
 
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
-//        if (fromPosition < toPosition) {
-//            for (int i = fromPosition; i < toPosition; i++) {
-//                Collections.swap(objects, i, i + 1);
-//                Collections.swap(Arrays.asList(actorArray.items), i, i + 1);
-//            }
-//        } else {
-//            for (int i = fromPosition; i > toPosition; i--) {
-//                Collections.swap(objects, i, i - 1);
-//                Collections.swap(Arrays.asList(actorArray.items), i, i - 1);
-//            }
-//        }
-        //notifyItemMoved(fromPosition, toPosition);
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                actor.swapEffects(i, i + 1);
+                notifyItemMoved(i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                actor.swapEffects(i, i - 1);
+                notifyItemMoved(i, i - 1);
+            }
+        }
     }
 
     @Override
     public void onItemMovingEnd() {
-
+        notifyDataSetChanged();
     }
 
     public static class LayerItemHolder extends RecyclerView.ViewHolder {
+        TextView position;
         TextView name;
         LinearLayout root;
         ImageView visibility;
@@ -106,17 +107,18 @@ public class EffectsListAdapter extends RecyclerView.Adapter<EffectsListAdapter.
 
         public LayerItemHolder(LayerItemBinding binding) {
             super(binding.getRoot());
+            this.position = binding.position;
             this.name = binding.name;
             this.root = binding.layerRoot;
             this.lock = binding.lock;
             this.dragHandle = binding.dragHandle;
             this.visibility = binding.visibility;
         }
-
     }
 
-    public interface LayerListeners {
-        void onLayerClick(ActorHandler object);
+    public interface EffectListeners {
+        void onEffectClick(BaseEffect effect);
+
         void onStartDrag(RecyclerView.ViewHolder viewHolder);
     }
 }

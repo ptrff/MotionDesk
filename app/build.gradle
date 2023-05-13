@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "ru.ptrff.motiondesk"
-        minSdk 23
+        minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -44,9 +44,6 @@ ext {
     gdxVersion = '1.11.0'
 }
 
-// called every time gradle gets executed, takes the native dependencies of
-// the natives configuration, and extracts them to the proper libs/ folders
-// so they get packed with the APK.
 task copyAndroidNatives {
     doFirst {
         file("libs/armeabi/").mkdirs()
@@ -81,7 +78,7 @@ tasks.whenTaskAdded { packageTask ->
 
 configurations { natives }
 dependencies {
-
+//    implementation 'androidx.lifecycle:lifecycle-reactivestreams:2.6.1'
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'

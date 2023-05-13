@@ -27,7 +27,7 @@ import android.view.ViewGroup;
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.databinding.FragmentProfileBinding;
 import ru.ptrff.motiondesk.adapters.WpprsAdapter;
-import ru.ptrff.motiondesk.data.WallpaperItem;
+import ru.ptrff.motiondesk.models.WallpaperItem;
 import ru.ptrff.motiondesk.viewmodel.MainViewModel;
 import ru.ptrff.motiondesk.viewmodel.ProfileViewModel;
 

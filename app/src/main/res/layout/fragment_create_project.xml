@@ -73,8 +73,8 @@
                             android:layout_marginBottom="5dp"
                             android:background="@drawable/rounded_outline_button"
                             android:button="@null"
-                            android:drawableLeft="@drawable/selector_2d_square"
-                            android:drawableRight="@drawable/transparent"
+                            android:drawableStart="@drawable/selector_2d_square"
+                            android:drawableEnd="@drawable/transparent"
                             android:drawablePadding="5dp"
                             android:gravity="center"
                             android:paddingLeft="15dp"
@@ -99,7 +99,7 @@
                                 android:layout_weight="1"
                                 android:background="@drawable/rounded_outline_button"
                                 android:button="@null"
-                                android:drawableLeft="@drawable/selector_web"
+                                android:drawableStart="@drawable/selector_web"
                                 android:drawablePadding="5dp"
                                 android:gravity="center"
                                 android:paddingLeft="15dp"
@@ -116,7 +116,7 @@
                                 android:layout_weight="1"
                                 android:background="@drawable/rounded_outline_button"
                                 android:button="@null"
-                                android:drawableLeft="@drawable/selector_image"
+                                android:drawableStart="@drawable/selector_image"
                                 android:drawablePadding="5dp"
                                 android:gravity="center"
                                 android:paddingLeft="15dp"
@@ -143,13 +143,13 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="5dp"
                             android:background="@drawable/rounded_outline_button"
-                            android:drawableLeft="@drawable/ic_edit"
+                            android:drawableStart="@drawable/ic_edit"
                             android:drawableTint="?bottomNavBarNotChecked"
-                            android:drawableRight="@drawable/transparent"
+                            android:drawableEnd="@drawable/transparent"
                             android:imeOptions="actionNext"
                             android:drawablePadding="5dp"
                             android:gravity="center"
-                            android:hint="Введите название"
+                            android:hint="@string/enter_name"
                             android:inputType="textPersonName"
                             android:paddingLeft="15dp"
                             android:paddingRight="15dp"
@@ -162,7 +162,7 @@
                             android:layout_marginStart="20dp"
                             android:layout_marginEnd="20dp"
                             android:layout_marginBottom="5dp"
-                            android:text="Придумайте хорошее название для ваших обоев. Оно может отображать персонажей/стиль/произведение и т.д." />
+                            android:text="@string/creation_imagination" />
 
                     </LinearLayout>
 
@@ -188,11 +188,11 @@
                                 android:layout_marginBottom="5dp"
                                 android:layout_weight="1"
                                 android:background="@drawable/rounded_outline_button"
-                                android:drawableLeft="@drawable/ic_width"
+                                android:drawableStart="@drawable/ic_width"
                                 android:drawablePadding="5dp"
                                 android:drawableTint="?bottomNavBarNotChecked"
                                 android:gravity="center"
-                                android:hint="Ширина"
+                                android:hint="@string/width"
                                 android:imeOptions="actionNext"
                                 android:inputType="number"
                                 android:paddingLeft="15dp"
@@ -209,11 +209,11 @@
                                 android:layout_marginBottom="5dp"
                                 android:layout_weight="1"
                                 android:background="@drawable/rounded_outline_button"
-                                android:drawableLeft="@drawable/ic_height"
+                                android:drawableStart="@drawable/ic_height"
                                 android:drawablePadding="5dp"
                                 android:drawableTint="?bottomNavBarNotChecked"
                                 android:gravity="center"
-                                android:hint="Высота"
+                                android:hint="@string/height"
                                 android:inputType="number"
                                 android:paddingLeft="15dp"
                                 android:paddingRight="15dp"
@@ -227,7 +227,7 @@
                             android:layout_marginStart="20dp"
                             android:layout_marginEnd="20dp"
                             android:layout_marginBottom="5dp"
-                            android:text="Оставьте поля пустыми, чтобы выбрать разрешение вашего экрана" />
+                            android:text="@string/creation_left_empty_fields" />
 
                     </LinearLayout>
 

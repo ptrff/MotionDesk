@@ -1,10 +1,8 @@
 package ru.ptrff.motiondesk.adapters;
 
 import android.annotation.SuppressLint;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -17,7 +15,7 @@ import com.badlogic.gdx.utils.Array;
 
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.databinding.LayerItemBinding;
-import ru.ptrff.motiondesk.engine.ActorHandler;
+import ru.ptrff.motiondesk.engine.scene.ActorHandler;
 import ru.ptrff.motiondesk.view.ItemMoveCallback;
 
 public class LayerListAdapter extends RecyclerView.Adapter<LayerListAdapter.LayerItemHolder> implements ItemMoveCallback.ItemTouchHelperAdapter {
@@ -43,9 +41,9 @@ public class LayerListAdapter extends RecyclerView.Adapter<LayerListAdapter.Laye
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onBindViewHolder(@NonNull LayerItemHolder holder, int position) {
+        holder.position.setText(position+".");
         holder.name.setText(actorArray.get(position).getName());
         holder.root.setOnClickListener(view -> {
-            System.out.println(position+"  "+holder.name.getText());
             listeners.onLayerClick(getActorHandler(position));
         });
         holder.dragHandle.setOnTouchListener((v, event) -> {
@@ -97,10 +95,6 @@ public class LayerListAdapter extends RecyclerView.Adapter<LayerListAdapter.Laye
                 notifyItemMoved(i, i - 1);
             }
         }
-        //notifyItemMoved(fromPosition, toPosition);
-        //notifyItemRangeChanged(fromPosition, fromPosition-toPosition);
-        //notifyDataSetChanged();
-        //notifyItemMoved(fromPosition, toPosition);
     }
 
     @Override
@@ -109,6 +103,7 @@ public class LayerListAdapter extends RecyclerView.Adapter<LayerListAdapter.Laye
     }
 
     public static class LayerItemHolder extends RecyclerView.ViewHolder {
+        TextView position;
         TextView name;
         LinearLayout root;
         ImageView visibility;
@@ -117,6 +112,7 @@ public class LayerListAdapter extends RecyclerView.Adapter<LayerListAdapter.Laye
 
         public LayerItemHolder(LayerItemBinding binding) {
             super(binding.getRoot());
+            this.position = binding.position;
             this.name = binding.name;
             this.root = binding.layerRoot;
             this.lock = binding.lock;

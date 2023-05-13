@@ -8,7 +8,6 @@
 
 varying vec2 v_texCoords;
 uniform sampler2D u_texture;
-uniform float u_amount;
 uniform float u_time;
 
 void main()

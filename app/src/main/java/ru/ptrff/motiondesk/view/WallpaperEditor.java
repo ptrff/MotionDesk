@@ -2,142 +2,296 @@ package ru.ptrff.motiondesk.view;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.WallpaperManager;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.transition.Explode;
 import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.ptrff.motiondesk.R;
+import ru.ptrff.motiondesk.adapters.EffectsListAdapter;
 import ru.ptrff.motiondesk.adapters.ToolbarAdapter;
-import ru.ptrff.motiondesk.data.ToolItem;
-import ru.ptrff.motiondesk.data.WallpaperItem;
 import ru.ptrff.motiondesk.databinding.ActivityWallpaperEditorBinding;
-import ru.ptrff.motiondesk.databinding.ObjectParametersViewBinding;
 import ru.ptrff.motiondesk.databinding.StateViewBinding;
-import ru.ptrff.motiondesk.engine.EngineEventsListener;
-import ru.ptrff.motiondesk.engine.WallpaperEditorEngine;
 import ru.ptrff.motiondesk.engine.WallpaperLibGdxFragment;
-import ru.ptrff.motiondesk.engine.WallpaperLibGdxService;
+import ru.ptrff.motiondesk.engine.effects.BaseEffect;
+import ru.ptrff.motiondesk.engine.scene.ActorHandler;
+import ru.ptrff.motiondesk.engine.scene.EngineEventsListener;
+import ru.ptrff.motiondesk.engine.scene.WallpaperEditorEngine;
+import ru.ptrff.motiondesk.models.WallpaperItem;
 import ru.ptrff.motiondesk.utils.BitmapProcessor;
-import ru.ptrff.motiondesk.utils.Converter;
-import ru.ptrff.motiondesk.utils.IDGenerator;
-import ru.ptrff.motiondesk.utils.ProjectManager;
+import ru.ptrff.motiondesk.viewmodel.EditorViewModel;
 
-public class WallpaperEditor extends AppCompatActivity implements AndroidFragmentApplication.Callbacks {
+public class WallpaperEditor extends AppCompatActivity implements AndroidFragmentApplication.Callbacks, EngineEventsListener {
 
     private ActivityWallpaperEditorBinding binding;
+    private EditorViewModel viewModel;
     private ToolbarAdapter toolbarAdapter;
-    private final List<ToolItem> tools = new ArrayList<>();
-    private WallpaperLibGdxFragment libgdxFragment;
+    private final CompositeDisposable disposables = new CompositeDisposable();
+
     private WallpaperEditorEngine engine;
-    private WallpaperItem wallpaperItem;
-    private String toolbarStatus;
-    private String name;
-    private int width;
-    private int height;
-    private PopupWindow loadingWindow;
+
+    private ProjectInfoFragment projectInfoFragment;
 
     //BottomSheetFragments
     private final FragmentManager fm = getSupportFragmentManager();
     private LayerListFragment layerListFragment;
     private EffectsListFragment effectsListFragment;
 
-    //Tools
-    private final Map<String, OnToolClickListener> toolsRunnables = new HashMap<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityWallpaperEditorBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        try {
-            setSupportActionBar(binding.toolbarTitle);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        setSupportActionBar(binding.toolbarTitle);
 
-        if(getIntent().getBooleanExtra("new_project", true)){
-            height = getIntent().getIntExtra("Height", 2340);
-            width = getIntent().getIntExtra("Width", 2340);
-            name = getIntent().getStringExtra("Name");
-        }else{
-            wallpaperItem = (WallpaperItem) getIntent().getSerializableExtra("wallpaper_item");
-            height = wallpaperItem.getHeight();
-            width = wallpaperItem.getWidth();
-            name = wallpaperItem.getName();
-        }
+        showLoading();
 
-        engine = new WallpaperEditorEngine(width, height, engineEventsListener);
-        engine.setResources(getResources());
+        viewModel = new ViewModelProvider(this).get(EditorViewModel.class);
+        if (getIntent().getBooleanExtra("new_project", true)) {
+            viewModel.setHeight(getIntent().getIntExtra("Height", 2340));
+            viewModel.setWidth(getIntent().getIntExtra("Width", 1080));
+            viewModel.setName(getIntent().getStringExtra("Name"));
+            viewModel.createNewWallpaperItem();
+        } else
+            viewModel.loadWallpaperItem((WallpaperItem) getIntent().getSerializableExtra("wallpaper_item"));
 
-        layerListFragment = new LayerListFragment(engine);
-        effectsListFragment = new EffectsListFragment(engine);
+        loadEditorEngine();
 
-        libgdxFragment = new WallpaperLibGdxFragment(engine);
-        getSupportFragmentManager().beginTransaction().
-                add(R.id.preview, libgdxFragment).
-                commit();
+        observeContent();
 
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getSupportActionBar().setHomeActionContentDescription(R.string.back);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(name);
+        getSupportActionBar().setTitle(viewModel.getName());
+
 
         setupActionBarButtons();
         setupBottomSheet();
-
-        setupToolsRunnables();
         setupToolbar();
-
-        resetTools();
     }
 
+    @SuppressLint("CheckResult")
+    public void loadEditorEngine() {
+        Observable
+                .just(new WallpaperEditorEngine(viewModel.getWidth(), viewModel.getHeight(), this))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(engine -> {
+                    this.engine = engine;
+                    viewModel.setEngine(engine);
+                    setupEnvironment(engine);
+                    engine.setResources(getResources());
+                    WallpaperLibGdxFragment libgdxFragment = new WallpaperLibGdxFragment(engine);
+                    getSupportFragmentManager().beginTransaction().
+                            add(R.id.preview, libgdxFragment).
+                            commit();
+
+                }, throwable -> {
+                    snackMessage(getString(R.string.error_creating_editor), binding.getRoot());
+                    Log.e("EditorViewModel", getString(R.string.error_creating_editor), throwable);
+                });
+    }
+
+    private void setupEnvironment(WallpaperEditorEngine engine) {
+        layerListFragment = new LayerListFragment(engine);
+        effectsListFragment = new EffectsListFragment(engine, effectListeners);
+
+        projectInfoFragment = new ProjectInfoFragment(viewModel.getWallpaperItem(), new ProjectInfoFragmentEvents() {
+            @Override
+            public void chooseImageFromGallery() {
+                chooseImage(101);
+            }
+
+            @Override
+            public void onProjectInfoChanged() {
+                viewModel.onProjectInfoChanged();
+            }
+        });
+
+        viewModel.getLoadingState().postValue(false);
+    }
+
+    @SuppressLint("CheckResult")
+    private void observeContent() {
+        viewModel.getToolbarToolsLiveData().observe(this, toolbarItems -> {
+            toolbarAdapter.submitListWithAnimation(null);
+            toolbarAdapter.submitListWithAnimation(toolbarItems);
+        });
+
+        viewModel.getBottomSheetOpenedLiveData().observe(this, opened -> {
+            if (opened)
+                BottomSheetBehavior.from(binding.bottomView).setState(BottomSheetBehavior.STATE_COLLAPSED);
+            else
+                BottomSheetBehavior.from(binding.bottomView).setState(BottomSheetBehavior.STATE_HIDDEN);
+        });
+
+        viewModel.getSnackMessageLiveData().observe(this,
+                snackMessage -> snackMessage(snackMessage, binding.getRoot())
+        );
+
+        viewModel.getAppBarTextLiveData().observe(this, appBarText -> {
+            getSupportActionBar().setTitle(appBarText);
+        });
+
+        viewModel.getShowProjectParameters().observe(this, unused -> {
+            showSceneParameters();
+        });
+
+        viewModel.getShowEffectParameters().observe(this, unused -> {
+            showEffectParameters(viewModel.getCurrentEffect());
+        });
+
+        viewModel.getShowObjectParameters().observe(this, unused -> {
+            showObjectParameters(engine.getObject(engine.getDraggedSpriteId()));
+        });
+
+        viewModel.getLoadingState().observe(this, isLoading -> {
+            if (isLoading) binding.loadingWindow.setVisibility(View.VISIBLE);
+            else binding.loadingWindow.setVisibility(View.GONE);
+        });
+
+        viewModel.getPickImageLiveData().observe(this, unused -> {
+            viewModel.getLoadingState().postValue(true);
+            chooseImage(100);
+        });
+
+        viewModel.getShowProjectInformation().observe(this, unused -> {
+            projectInfoFragment.show(getSupportFragmentManager(), "project info");
+        });
+
+        viewModel.getStartPreviewLiveData().observe(this, unused -> {
+            Intent intent = new Intent(WallpaperEditor.this, WallpaperPreview.class);
+            intent.putExtra("wallpaper_item", viewModel.getWallpaperItem());
+            getWindow().setExitTransition(new Explode());
+            startActivity(intent);
+        });
+
+        viewModel.getCurrentBottomContentLiveData().observe(this, currentBottomContent -> {
+            System.out.println("WAWALWALLWAWA");
+            if (currentBottomContent.equals("layers")) {
+                selectBottomContent(
+                        layerListFragment,
+                        getString(R.string.layers),
+                        getDrawable(R.drawable.ic_layers)
+                );
+            }
+            if (currentBottomContent.equals("effects")) {
+                selectBottomContent(
+                        effectsListFragment,
+                        getString(R.string.effects),
+                        getDrawable(R.drawable.ic_effects)
+                );
+            }
+        });
+
+        viewModel.getBottomSheetUpdateActionLiveData().observe(this, unused -> {
+            String currentBottomContent = viewModel.getCurrentBottomContentLiveData().getValue();
+            if (currentBottomContent != null) {
+                if (currentBottomContent.equals("layers")) {
+                    layerListFragment.onResume();
+                }
+                if (currentBottomContent.equals("effects")) {
+                    effectsListFragment.onResume();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onObjectSelected(String type, int index) {
+        if (viewModel.getToolbarStatus().equals("image_params") ||
+                !engine.getObject(index).getName().equals(viewModel.getToolbarStatus())) {
+            viewModel.showEditObjectTools();
+        }
+
+        if (Objects.equals(viewModel.getCurrentBottomContentLiveData().getValue(), "effects")) {
+            runOnUiThread(() -> effectsListFragment.onResume());
+        }
+    }
+
+    @Override
+    public void onObjectNotSelected() {
+        if (!viewModel.getToolbarStatus().equals("default")) {
+            viewModel.resetTools();
+        }
+    }
+
+    @Override
+    public void onObjectAdded(int position) {
+        viewModel.getLoadingState().postValue(false);
+        runOnUiThread(() -> layerListFragment.notifyItemInserted(position));
+    }
+
+    @Override
+    public void onObjectRemoved(int position) {
+        runOnUiThread(() -> layerListFragment.notifyItemRemoved(position));
+    }
+
+    @Override
+    public void onStartDrawingMask(int index) {
+        viewModel.showDrawingMaskTools();
+        getSupportActionBar().setTitle(engine.getObject(index).getName());
+    }
+
+    @Override
+    public void onStopDrawingMask() {
+
+    }
+
+    @Override
+    public void onEffectAdded() {
+        runOnUiThread(() -> effectsListFragment.onResume());
+    }
+
+    @Override
+    public void snackMessage(String message) {
+        WallpaperEditor.this.snackMessage(message, binding.getRoot());
+    }
+
+    private final EffectsListAdapter.EffectListeners effectListeners = new EffectsListAdapter.EffectListeners() {
+        @Override
+        public void onEffectClick(BaseEffect effect) {
+            viewModel.setCurrentEffect(effect);
+            viewModel.showEditEffectTools();
+        }
+
+        @Override
+        public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        }
+    };
 
     private void chooseImage(int code) {
         Intent intent = new Intent();
@@ -146,178 +300,73 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
         startActivityForResult(Intent.createChooser(intent, getString(R.string.choose_image)), code);
     }
 
+    @SuppressLint("CheckResult")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri uri = data.getData();
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-                if (requestCode == 100) {
-                    engine.addImage(bitmap);
-                }
-                if (requestCode == 101) {
-                    saveProject(bitmap);
-                }
-            } catch (IOException e) {
-                Log.e("WallpaperEditor", "Error getting image from gallery", e);
+
+            if (requestCode == 100) {
+                disposables.add(loadImage(uri)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(bitmap -> viewModel.onImagePicked(requestCode, bitmap),
+                                error -> {
+                                    viewModel.getLoadingState().postValue(false);
+                                    snackMessage(getString(R.string.error_image_import), binding.getRoot());
+                                    Log.e("WallpaperEditor", getString(R.string.error_image_import), error);
+                                }));
+            }
+            if (requestCode == 101) {
+                loadImage(uri)
+                        .flatMap(this::resizeImage)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(resizedBitmap -> {
+                                    projectInfoFragment.setNewImage(resizedBitmap);
+                                }, error -> {
+                                    projectInfoFragment.newImageLoadingFailed();
+                                    viewModel.getLoadingState().postValue(false);
+                                    Log.e("WallpaperEditor", "Error getting image from gallery", error);
+                                }
+                        );
+            }
+        } else {
+            viewModel.getLoadingState().postValue(false);
+            if (requestCode == 101) {
+                projectInfoFragment.newImageLoadingFailed();
             }
         }
     }
 
-    private void resetTools() {
-        clearTools();
-        toolbarStatus = "default";
-        tools.add(new ToolItem(R.drawable.ic_add, getString(R.string.add)));
-        tools.add(new ToolItem(R.drawable.ic_layers, getString(R.string.layer)));
-        tools.add(new ToolItem(R.drawable.ic_center_cam, getString(R.string.center_obj)));
-        setupToolbar();
-        hideBottomSheet();
+    private Observable<Bitmap> resizeImage(Bitmap bitmap) {
+        return Observable.fromCallable(() -> BitmapProcessor.scaleBitmap(bitmap, 360, 540));
+    }
+
+    private Observable<Bitmap> loadImage(Uri uri) {
+        return Observable.fromCallable(() -> MediaStore.Images.Media.getBitmap(getContentResolver(), uri));
     }
 
     private void setupToolbar() {
-        toolbarAdapter = new ToolbarAdapter(tools, toolClickListener);
+        toolbarAdapter = new ToolbarAdapter(tool -> viewModel.onToolbarToolClicked(tool));
+
         LinearLayoutManager sGrid = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         binding.toolbarTools.setLayoutManager(sGrid);
         binding.toolbarTools.setAdapter(toolbarAdapter);
     }
 
-    private void showEditObjectTools() {
-        clearTools();
-        toolbarStatus = "image_params";
-        tools.add(new ToolItem(R.drawable.ic_parameters, getString(R.string.parameters)));
-        tools.add(new ToolItem(R.drawable.ic_mask, getString(R.string.mask)));
-        tools.add(new ToolItem(R.drawable.ic_effects, getString(R.string.effects)));
-        tools.add(new ToolItem(R.drawable.ic_delete, getString(R.string.remove)));
-        setupToolbar();
-    }
 
-    private void showDrawingMaskTools() {
-        clearTools();
-        toolbarStatus = "drawing_mask";
-        tools.add(new ToolItem(R.drawable.ic_done, getString(R.string.apply)));
-        tools.add(new ToolItem(R.drawable.ic_center_cam, getString(R.string.center_obj)));
-        tools.add(new ToolItem(R.drawable.ic_brush, getString(R.string.brush)));
-        tools.add(new ToolItem(R.drawable.ic_negative, getString(R.string.negative)));
-        tools.add(new ToolItem(R.drawable.ic_delete, getString(R.string.remove)));
-        setupToolbar();
-    }
-
-    private void clearTools() {
-        tools.clear();
-        toolbarAdapter.notifyDataSetChanged();
-    }
-
-    private void setupToolsRunnables() {
-        toolsRunnables.put(
-                getString(R.string.add),
-                tool -> chooseImage(100)
-        );
-        toolsRunnables.put(
-                getString(R.string.remove),
-                tool -> engine.removeObject()
-        );
-        toolsRunnables.put(
-                getString(R.string.layers),
-                tool -> selectBottomContent(tool, layerListFragment)
-        );
-        toolsRunnables.put(
-                getString(R.string.center_obj),
-                tool -> {
-                    if (engine.isObjectSelected()) engine.centerCamera(engine.getDraggedSpriteId());
-                    else engine.centerCamera(-1);
-                }
-        );
-        toolsRunnables.put(
-                getString(R.string.parameters),
-                tool -> selectBottomContent(tool, new LibFragment())
-        );
-        toolsRunnables.put(
-                getString(R.string.mask),
-                tool -> engine.startDrawingMask()
-        );
-        toolsRunnables.put(
-                getString(R.string.effects),
-                tool -> selectBottomContent(tool, effectsListFragment)
-        );
-        toolsRunnables.put(
-                getString(R.string.apply),
-                tool -> {
-                    engine.stopDrawingMask();
-                    showEditObjectTools();
-                }
-        );
-        toolsRunnables.put(
-                getString(R.string.parameters),
-                tool -> showObjectParameters()
-        );
-    }
-
-    private final ToolbarAdapter.OnImageClickListener toolClickListener = tool -> {
-        OnToolClickListener action = toolsRunnables.get(tool.getLabel());
-        if (action != null) {
-            action.onClick(tool);
-        } else {
-            snackMessage(getString(R.string.instrumentGettingError), binding.getRoot());
-        }
-    };
-
-    private void selectBottomContent(ToolItem tool, Fragment fragment) {
-        BottomSheetBehavior.from(binding.bottomView).setState(BottomSheetBehavior.STATE_COLLAPSED);
-        binding.title.setText(tool.getLabel());
-        binding.icon.setImageResource(tool.getImageResourse());
+    private void selectBottomContent(Fragment fragment, String name, Drawable icon) {
+        binding.title.setText(name);
+        binding.icon.setImageDrawable(icon);
+        fragment.onResume();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(binding.content.getId(), fragment);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         transaction.addToBackStack(null);
         transaction.commit();
     }
-
-    private final EngineEventsListener engineEventsListener = new EngineEventsListener() {
-        @Override
-        public void onObjectSelected(String type, int index) {
-            if (!Objects.equals(toolbarStatus, "image_params") || engine.getObject(index).getName() != getSupportActionBar().getTitle())
-                runOnUiThread(() -> {
-                    showEditObjectTools();
-                    getSupportActionBar().setTitle(engine.getObject(index).getName());
-                });
-        }
-
-        @Override
-        public void onObjectNotSelected() {
-            if (!Objects.equals(toolbarStatus, "default"))
-                runOnUiThread(() -> {
-                    resetTools();
-                    getSupportActionBar().setTitle(name);
-                });
-        }
-
-        @Override
-        public void onObjectAdded(int position) {
-            if (binding.title.getText().equals(getString(R.string.layers))) {
-                layerListFragment.notifyItemInserted(position);
-            }
-        }
-
-        @Override
-        public void onObjectRemoved(int position) {
-            BottomSheetBehavior behavior = BottomSheetBehavior.from(binding.bottomView);
-            if (binding.title.getText().equals(getString(R.string.layers)) && behavior.getState() != BottomSheetBehavior.STATE_HIDDEN) {
-                layerListFragment.notifyItemRemoved(position);
-            }
-        }
-
-        @Override
-        public void onStartDrawingMask(int index) {
-            showDrawingMaskTools();
-            getSupportActionBar().setTitle(engine.getObject(index).getName());
-        }
-
-        @Override
-        public void onStopDrawingMask() {
-
-        }
-    };
 
     private void snackMessage(String message, View root) {
         Snackbar.make(root, message, BaseTransientBottomBar.LENGTH_SHORT)
@@ -326,31 +375,32 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
                 .show();
     }
 
-    private void hideBottomSheet() {
-        BottomSheetBehavior.from(binding.bottomView).setState(BottomSheetBehavior.STATE_HIDDEN);
-    }
-
     private void setupBottomSheet() {
         binding.bottomView.setZ(binding.bottomView.getZ() + 1);
-        BottomSheetBehavior behavior = BottomSheetBehavior.from(binding.bottomView);
+        BottomSheetBehavior<LinearLayout> behavior = BottomSheetBehavior.from(binding.bottomView);
         behavior.setDraggable(true);
         behavior.setPeekHeight(1000);
         behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
         behavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                    //binding.content.removeAllViews();
-                }
-                if (newState == BottomSheetBehavior.STATE_EXPANDED || newState == BottomSheetBehavior.STATE_COLLAPSED) {
-
-                }
+                if (newState == BottomSheetBehavior.STATE_HIDDEN)
+                    viewModel.setBottomSheetClosed();
             }
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
             }
+        });
+
+        binding.add.setOnClickListener(v -> {
+            if (binding.title.getText().toString().equals(getString(R.string.layers))) {
+                viewModel.getLoadingState().postValue(true);
+                chooseImage(100);
+            }
+            if (binding.title.getText().toString().equals(getString(R.string.effects)))
+                showChooseEffectDialog();
         });
     }
 
@@ -365,13 +415,10 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.apply:
-                        Intent intent = new Intent(
-                                WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
-                        intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(WallpaperEditor.this, WallpaperLibGdxService.class));
-                        startActivity(intent);
+                        viewModel.startPreview(WallpaperEditor.this);
                         break;
                     case R.id.pause:
-                        engine.playPause();
+                        viewModel.playPauseEngine();
                         menuItem.setTitle(R.string.resume);
                         break;
                     default:
@@ -390,7 +437,7 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
     }
 
     @SuppressLint("CheckResult")
-    private void showObjectParameters() {
+    /*private void showObjectParameters() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         ObjectParametersViewBinding dialogBinding = ObjectParametersViewBinding.bind(getLayoutInflater().inflate(R.layout.object_parameters_view, null));
@@ -471,21 +518,9 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
                     dialogBinding.button.setTextColor(ColorStateList.valueOf(getColor(R.color.red)));
                     dialogBinding.button.setOnClickListener(v -> dialog.dismiss());
                 });
-    }
+    }*/
 
-    public boolean checkInfoFields(EditText editText) {
-        String text = editText.getText().toString().trim();
 
-        if (text.isEmpty()) return false;
-
-        try {
-            Float.parseFloat(text);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-
-        return true;
-    }
 
     private void showSaveChangesDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -512,9 +547,113 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
             finish();
         });
         dialogBinding.button2.setOnClickListener(view -> {
-            chooseImage(101);
             dialog.dismiss();
+            viewModel.getLoadingState().postValue(true);
+            Observable
+                    .fromCallable(() -> {
+                        viewModel.saveProject();
+                        return true;
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(nothing -> {
+                        finish();
+                    });
         });
+    }
+
+    @SuppressLint("CheckResult")
+    private void showSceneParameters(){
+        Observable
+                .just(new SimpleInputBottomDialog.Builder(this)
+                        .setTitle(getString(R.string.scene_parameters))
+                        .addLabel("fdsfdsf")
+                        .build())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(dialog -> {
+                    dialog.show(getSupportFragmentManager(), "scene parameters");
+                    dialog.setInputFieldCallback((typeName, value) -> {
+                    });
+                });
+    }
+
+    @SuppressLint("CheckResult")
+    private void showObjectParameters(ActorHandler actor) {
+        Observable
+                .just(new SimpleInputBottomDialog.Builder(this)
+                        .setTitle(actor.getName())
+                        .addTextField("name", getString(R.string.name), "string", 1, Integer.MAX_VALUE, actor.getName())
+                        .addTextField("xpos", "X", "float", Integer.MIN_VALUE, Integer.MAX_VALUE, actor.getActorX())
+                        .addTextField("ypos", "Y", "float", Integer.MIN_VALUE, Integer.MAX_VALUE, actor.getActorY())
+                        .addTextField("rot", getString(R.string.rotation), "float", 0, 360, actor.getActorRotation())
+                        .addTextField("width", getString(R.string.width), "float", Integer.MIN_VALUE, Integer.MAX_VALUE, actor.getActorWidth())
+                        .addTextField("height", getString(R.string.height), "float", Integer.MIN_VALUE, Integer.MAX_VALUE, actor.getActorHeight())
+                        .build())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(dialog -> {
+                    dialog.show(getSupportFragmentManager(), actor.getName() + " parameters");
+                    dialog.setInputFieldCallback((typeName, value) -> {
+                        if (typeName.equals("name")) {
+                            actor.setName(value.toString());
+                            actor.getImageActor().setName(value.toString());
+                            getSupportActionBar().setTitle(getString(R.string.object_appbar_letter) + value);
+                            //todo fix name setting
+                        }
+                        if (typeName.equals("xpos")) {
+                            actor.setActorPosition(Float.parseFloat(value.toString()), actor.getActorY());
+                        }
+                        if (typeName.equals("ypos")) {
+                            actor.setActorPosition(actor.getActorX(), Float.parseFloat(value.toString()));
+                        }
+                        if (typeName.equals("rot")) {
+                            actor.setActorRotation(Float.parseFloat(value.toString()));
+                        }
+                        if (typeName.equals("width")) {
+                            actor.setActorWidth(Float.parseFloat(value.toString()));
+                        }
+                        if (typeName.equals("height")) {
+                            actor.setActorHeight(Float.parseFloat(value.toString()));
+                        }
+                    });
+                });
+    }
+
+    @SuppressLint("CheckResult")
+    private void showEffectParameters(BaseEffect effect) {
+        Observable
+                .just(new SimpleInputBottomDialog.Builder(this)
+                        .setTitle(effect.getName())
+                        .fromParameters(effect.getParameters())
+                        .build())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(dialog -> {
+                    dialog.show(getSupportFragmentManager(), effect.getName() + " parameters");
+                    dialog.setParameterFieldCallback(field -> {
+                        effect.onParameterChanged(field);
+                        viewModel.onEffectParameterChanged(field);
+                    });
+                });
+    }
+
+    @SuppressLint("CheckResult")
+    private void showChooseEffectDialog() {
+        Observable
+                .just(new SimpleInputBottomDialog.Builder(this)
+                        .setTitle(getString(R.string.choose_effect))
+                        .addImageButton(R.drawable.ic_tv, getString(R.string.glitch))
+                        .addImageButton(R.drawable.ic_wind, getString(R.string.windy_swings))
+                        .addImageButton(R.drawable.ic_move, getString(R.string.parallax))
+                        .addImageButton(R.drawable.ic_shake, getString(R.string.shake))
+                        .build())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(dialog -> {
+                    dialog.show(getSupportFragmentManager(), getString(R.string.choose_effect));
+                    dialog.setImageButtonCallback(text -> viewModel.addEffect(text));
+                });
     }
 
     @Override
@@ -527,85 +666,13 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
 
     }
 
-    @SuppressLint("CheckResult")
-    private void saveProject(Bitmap preview) {
-        showLoading();
-
-        if (wallpaperItem == null) {
-            createNewWallpaperItem();
-        }
-
-        Observable.just(BitmapProcessor.scaleBitmap(preview, 360, 540))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .delay(1, TimeUnit.SECONDS)
-                .subscribe(bitmap -> {
-                    hideLoading();
-                    ProjectManager.createProject(
-                            this,
-                            bitmap,
-                            wallpaperItem,
-                            engine.getZipMaster()
-                    );
-                    finish();
-                }, throwable -> {
-                    hideLoading();
-                    snackMessage(getString(R.string.saving_project_error), binding.getRoot());
-                    Log.e("WallpaperEditor", getString(R.string.saving_project_error), throwable);
-                });
-    }
-
-    private void createNewWallpaperItem() {
-        String author = "";
-        String description = "";
-        String rating = "";
-        wallpaperItem = new WallpaperItem(
-                false,
-                IDGenerator.generateID(),
-                name,
-                author,
-                description,
-                width,
-                height,
-                "scene",
-                rating,
-                "");
-    }
-
-    private void hideLoading(){
-        runOnUiThread(() -> loadingWindow.dismiss());
+    private void hideLoading() {
+        binding.loadingWindow.setVisibility(View.GONE);
+        binding.loadingIndicator.stopShimmerAnimation();
     }
 
     private void showLoading() {
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int windowSize = Converter.dpToPx(150);
-
-        LinearLayout rootView = new LinearLayout(this);
-        rootView.setGravity(Gravity.CENTER);
-
-        CardView cardMask = new CardView(this);
-        cardMask.setRadius(50);
-
-        ShimmerView shimmerView = new ShimmerView(this, true);
-        shimmerView.setLayoutParams(new LinearLayout.LayoutParams(windowSize, windowSize));
-        shimmerView.startShimmerAnimation();
-        shimmerView.setRadius(20);
-        shimmerView.setShimmerAnimationDuration(1500);
-
-        cardMask.addView(shimmerView);
-        rootView.addView(cardMask);
-
-        loadingWindow = new PopupWindow(rootView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        ColorDrawable colorDrawable = new ColorDrawable(Color.BLACK);
-        colorDrawable.setAlpha(128);
-        loadingWindow.setBackgroundDrawable(colorDrawable);
-        loadingWindow.setBackgroundDrawable(colorDrawable);
-        loadingWindow.setElevation(10);
-
-        loadingWindow.setAnimationStyle(android.R.style.Animation_Toast);
-        loadingWindow.setOutsideTouchable(false);
-        loadingWindow.showAtLocation(binding.content, Gravity.CENTER, 0, 0);
+        binding.loadingWindow.setVisibility(View.VISIBLE);
+        binding.loadingIndicator.startShimmerAnimation();
     }
 }

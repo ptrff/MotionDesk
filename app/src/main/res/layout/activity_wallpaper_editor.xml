@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     tools:context=".view.WallpaperEditor">
 
     <LinearLayout
@@ -15,23 +15,23 @@
             android:id="@+id/appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:elevation="0dp"
-            android:theme="@style/Theme.MotionDesk">
+            android:theme="@style/Theme.MotionDesk"
+            app:elevation="0dp">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar_title"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/editor_app_bar_size"
                 android:background="?backgroundBlackWhite"
-                app:popupTheme="@style/Theme.MotionDesk"
-                app:layout_scrollFlags="enterAlways" />
+                app:layout_scrollFlags="enterAlways"
+                app:popupTheme="@style/Theme.MotionDesk" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/toolbar_tools"
                 android:layout_width="match_parent"
-                android:background="?backgroundBlackWhite"
                 android:layout_height="50dp"
-                android:orientation="horizontal"/>
+                android:background="?backgroundBlackWhite"
+                android:orientation="horizontal" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -49,14 +49,14 @@
                 android:id="@+id/floatingActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentBottom="true"
-                android:alpha="0.5"
-                android:layout_marginBottom="15dp"
                 android:layout_marginEnd="15dp"
+                android:layout_marginBottom="15dp"
+                android:alpha="0.5"
                 android:backgroundTint="?colorSecondary"
-                android:src="@drawable/ic_parameters" />
+                android:src="@drawable/ic_parameters"
+                android:visibility="gone" />
 
         </RelativeLayout>
     </LinearLayout>
@@ -65,50 +65,126 @@
         android:id="@+id/bottom_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         app:behavior_hideable="true"
         app:behavior_peekHeight="0dp"
-        app:layout_behavior="@string/bottom_sheet_behavior"
-        android:orientation="vertical">
+        app:layout_behavior="@string/bottom_sheet_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/right_top_rounded"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:paddingEnd="17dp"
-                android:paddingStart="12dp"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="17dp"
+                android:paddingBottom="5dp">
 
                 <ImageView
                     android:id="@+id/icon"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerInside"
-                    app:tint="?foregroundBlackWhite"
-                    android:src="@drawable/ic_layers"/>
+                    android:src="@drawable/ic_layers"
+                    app:tint="?foregroundBlackWhite" />
 
                 <TextView
                     android:id="@+id/title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
+                    android:textColor="?foregroundBlackWhite"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="?foregroundBlackWhite" />
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:id="@+id/add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/left_top_rounded"
+                android:clickable="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="17dp"
+                android:paddingBottom="5dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_add"
+                    app:tint="?foregroundBlackWhite" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/add"
+                    android:textColor="?foregroundBlackWhite"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
 
-            <FrameLayout
-                android:id="@+id/content"
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:background="?backgroundBlackWhite"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        <FrameLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:background="?backgroundBlackWhite"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/loading_window"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:clickable="true">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?backgroundBlackWhite"
+            android:alpha="0.5"/>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            app:cardCornerRadius="@dimen/card_corners"
+            android:layout_centerInParent="true"
+            android:backgroundTint="?backgroundBlackWhite"
+            app:cardElevation="0dp">
+
+            <ru.ptrff.motiondesk.view.ShimmerView
+                android:id="@+id/loading_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:isCubic="true"
+                app:shimmerAnimationDuration="1500"
+                app:shimmerColor="?colorAccent"
+                app:shimmerColorBackground="?backgroundBlackWhite"
+                app:shimmerRadius="20px" />
+
+        </androidx.cardview.widget.CardView>
+
+    </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

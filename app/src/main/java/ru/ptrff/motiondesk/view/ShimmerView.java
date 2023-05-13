@@ -1,5 +1,6 @@
 package ru.ptrff.motiondesk.view;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -19,6 +20,7 @@ public class ShimmerView extends View {
     private static final int DEFAULT_RADIUS = 30;
     private static final int DEFAULT_COLOR = Color.WHITE;
     private static final int DEFAULT_BACKGROUND_COLOR = Color.BLACK;
+    private static final boolean DEFAULT_IS_CUBIC = false;
 
     private final Paint shimmerPaint;
     private final Paint backgroundPaint;
@@ -35,15 +37,18 @@ public class ShimmerView extends View {
 
     public ShimmerView(Context context) {
         this(context, null);
+        setLayerType(LAYER_TYPE_SOFTWARE, null);
     }
 
     public ShimmerView(Context context, boolean isCubic) {
         this(context, null);
         this.isCubic=isCubic;
+        setLayerType(LAYER_TYPE_SOFTWARE, null);
     }
 
     public ShimmerView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
+        setLayerType(LAYER_TYPE_SOFTWARE, null);
     }
 
     public ShimmerView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -54,6 +59,7 @@ public class ShimmerView extends View {
         radius = DEFAULT_RADIUS;
         shimmerColor = DEFAULT_COLOR;
         backgroundColor = DEFAULT_BACKGROUND_COLOR;
+        isCubic = DEFAULT_IS_CUBIC;
         shimmerAnimation = new ShimmerAnimation();
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ShimmerView);
@@ -61,8 +67,10 @@ public class ShimmerView extends View {
         backgroundColor = a.getColor(R.styleable.ShimmerView_shimmerColorBackground, Color.BLACK);
         shimmerAnimationDuration = a.getInt(R.styleable.ShimmerView_shimmerAnimationDuration, DEFAULT_ANIMATION_DURATION);
         radius = a.getDimensionPixelSize(R.styleable.ShimmerView_shimmerRadius, DEFAULT_RADIUS);
+        isCubic = a.getBoolean(R.styleable.ShimmerView_isCubic, DEFAULT_IS_CUBIC);
         a.recycle();
         globalTimer = SystemClock.elapsedRealtime();
+        setLayerType(LAYER_TYPE_SOFTWARE, null);
     }
 
     @Override
@@ -131,9 +139,14 @@ public class ShimmerView extends View {
     }
 
     public void startShimmerAnimation() {
-        shimmerAnimation.setDuration(shimmerAnimationDuration);
-        shimmerAnimation.setRepeatCount(Animation.INFINITE);
-        startAnimation(shimmerAnimation);
+        ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f); //TODO fix animations
+        animator.setDuration(shimmerAnimationDuration);
+        animator.setRepeatCount(ValueAnimator.INFINITE);
+        animator.addUpdateListener(animation -> {
+            updateAnimationState();
+            invalidate();
+        });
+        animator.start();
     }
 
     public void stopShimmerAnimation() {

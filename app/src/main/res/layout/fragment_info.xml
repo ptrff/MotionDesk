@@ -49,7 +49,7 @@
                             app:shimmerRadius="5dp" />
 
                         <ImageView
-                            android:id="@+id/backrgoundImage"
+                            android:id="@+id/backgroundImage"
                             android:layout_width="360px"
                             android:layout_height="540px"
                             android:adjustViewBounds="true"
@@ -144,6 +144,7 @@
                                 app:tint="?colorAccent" />
 
                             <TextView
+                                android:id="@+id/resolution"
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
                                 android:gravity="center"
@@ -169,6 +170,7 @@
                                 app:tint="?colorAccent" />
 
                             <TextView
+                                android:id="@+id/size"
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
                                 android:gravity="center"

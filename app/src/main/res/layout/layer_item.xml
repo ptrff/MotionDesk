@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layer_root"
     android:layout_width="match_parent"
     android:orientation="horizontal"
@@ -8,6 +8,20 @@
     android:paddingRight="15dp"
     android:paddingLeft="15dp"
     android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:layout_marginEnd="15dp"
+        android:singleLine="true"
+        android:textStyle="bold"
+        android:maxLines="1"
+        android:textSize="16sp"
+        android:textColor="?foregroundBlackWhite"
+        tools:text="1."
+        />
 
     <TextView
         android:id="@+id/name"
@@ -18,7 +32,7 @@
         android:maxLines="1"
         android:textSize="16sp"
         android:textColor="?foregroundBlackWhite"
-        android:text="Название слоя"
+        tools:text="Название слоя"
         />
 
     <ImageView

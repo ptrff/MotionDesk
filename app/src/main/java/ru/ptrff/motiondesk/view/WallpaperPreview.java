@@ -16,67 +16,33 @@ import android.view.MenuItem;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 
 import ru.ptrff.motiondesk.R;
+import ru.ptrff.motiondesk.models.WallpaperItem;
 import ru.ptrff.motiondesk.databinding.ActivityWallpaperPreviewBinding;
-import ru.ptrff.motiondesk.engine.EngineEventsListener;
 import ru.ptrff.motiondesk.engine.WallpaperLibGdxFragment;
-import ru.ptrff.motiondesk.engine.WallpaperEditorEngine;
 import ru.ptrff.motiondesk.engine.WallpaperLibGdxService;
 
 public class WallpaperPreview extends AppCompatActivity implements  AndroidFragmentApplication.Callbacks{
 
     private ActivityWallpaperPreviewBinding binding;
+    private WallpaperItem wallpaperItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityWallpaperPreviewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        try {
-            setSupportActionBar(binding.toolbar);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        setSupportActionBar(binding.toolbar);
+
+        wallpaperItem = (WallpaperItem) getIntent().getSerializableExtra("wallpaper_item");
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getSupportActionBar().setHomeActionContentDescription("Назад");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(getIntent().getStringExtra("Name"));
+        getSupportActionBar().setTitle(wallpaperItem.getName());
 
         setupActionBarButtons();
 
-        WallpaperEditorEngine engine = new WallpaperEditorEngine(150, 150, new EngineEventsListener() {
-            @Override
-            public void onObjectSelected(String type, int index) {
-
-            }
-
-            @Override
-            public void onObjectNotSelected() {
-
-            }
-
-            @Override
-            public void onObjectAdded(int position) {
-
-            }
-
-            @Override
-            public void onObjectRemoved(int position) {
-
-            }
-
-            @Override
-            public void onStartDrawingMask(int index) {
-
-            }
-
-            @Override
-            public void onStopDrawingMask() {
-
-            }
-        });
-
-        WallpaperLibGdxFragment libgdxFragment = new WallpaperLibGdxFragment(engine);
+        WallpaperLibGdxFragment libgdxFragment = new WallpaperLibGdxFragment();
 
         getSupportFragmentManager().beginTransaction().
                 add(R.id.preview, libgdxFragment).

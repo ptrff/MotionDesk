@@ -10,21 +10,25 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import ru.ptrff.motiondesk.adapters.EffectsListAdapter;
-import ru.ptrff.motiondesk.adapters.LayerListAdapter;
-import ru.ptrff.motiondesk.databinding.FragmentEditorLayersBinding;
-import ru.ptrff.motiondesk.engine.ActorHandler;
-import ru.ptrff.motiondesk.engine.WallpaperEditorEngine;
+import com.badlogic.gdx.graphics.g2d.Batch;
 
-public class EffectsListFragment extends Fragment implements EffectsListAdapter.LayerListeners{
+import ru.ptrff.motiondesk.adapters.EffectsListAdapter;
+import ru.ptrff.motiondesk.databinding.FragmentEditorLayersBinding;
+import ru.ptrff.motiondesk.engine.effects.BaseEffect;
+import ru.ptrff.motiondesk.engine.scene.ActorHandler;
+import ru.ptrff.motiondesk.engine.scene.WallpaperEditorEngine;
+
+public class EffectsListFragment extends Fragment implements EffectsListAdapter.EffectListeners{
 
     private final WallpaperEditorEngine engine;
     private EffectsListAdapter adapter;
     private FragmentEditorLayersBinding binding;
     private ItemTouchHelper touchHelper;
+    private final EffectsListAdapter.EffectListeners effectListeners;
 
-    EffectsListFragment(WallpaperEditorEngine engine){
+    public EffectsListFragment(WallpaperEditorEngine engine, EffectsListAdapter.EffectListeners effectListeners){
         this.engine = engine;
+        this.effectListeners = effectListeners;
     }
 
     @Override
@@ -36,34 +40,46 @@ public class EffectsListFragment extends Fragment implements EffectsListAdapter.
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentEditorLayersBinding.inflate(inflater);
 
-        adapter = new EffectsListAdapter(engine.getStageActorArray().get(engine.getDraggedSpriteId()).getEffects(), this);
-        binding.layerList.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true));
-        binding.layerList.setAdapter(adapter);
-
-        ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
-        touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(binding.layerList);
-
+        onResume();
         return binding.getRoot();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(binding != null) {
+            adapter = new EffectsListAdapter(engine.getStageActorArray().get(engine.getDraggedSpriteId()), this);
+            binding.layerList.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true));
+            binding.layerList.setAdapter(adapter);
+
+            ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
+            touchHelper = new ItemTouchHelper(callback);
+            touchHelper.attachToRecyclerView(binding.layerList);
+        }
+    }
+
     public void notifyItemInserted(int position){
-        adapter.notifyItemInserted(position);
+        if(adapter!=null) {
+            adapter.notifyItemInserted(position);
+        }
     }
 
     public void notifyItemRemoved(int position){
-        adapter.notifyItemRemoved(position);
-        adapter = new EffectsListAdapter(engine.getStageActorArray().get(engine.getDraggedSpriteId()).getEffects(), this);
-        binding.layerList.setAdapter(adapter);
+        if(adapter!=null) {
+            adapter.notifyItemRemoved(position);
+            adapter = new EffectsListAdapter(engine.getStageActorArray().get(engine.getDraggedSpriteId()), this);
+            binding.layerList.setAdapter(adapter);
 
-        ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
-        touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(binding.layerList);
+            ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
+            touchHelper = new ItemTouchHelper(callback);
+            touchHelper.attachToRecyclerView(binding.layerList);
+        }
     }
 
     @Override
-    public void onLayerClick(ActorHandler object) {
-        engine.chooseObject(object);
+    public void onEffectClick(BaseEffect effect) {
+        effectListeners.onEffectClick(effect);
     }
 
     @Override

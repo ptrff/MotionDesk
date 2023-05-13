@@ -1,19 +1,34 @@
 package ru.ptrff.motiondesk.utils;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.compression.lzma.Base;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import org.w3c.dom.Text;
+
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.ptrff.motiondesk.engine.ActorHandler;
-import ru.ptrff.motiondesk.engine.BaseEffect;
-import ru.ptrff.motiondesk.engine.GlitchEffect;
-import ru.ptrff.motiondesk.engine.ImageActor;
+import ru.ptrff.motiondesk.engine.effects.GlitchEffect;
+import ru.ptrff.motiondesk.engine.effects.ParallaxEffect;
+import ru.ptrff.motiondesk.engine.effects.ShakeEffect;
+import ru.ptrff.motiondesk.engine.scene.ActorHandler;
+import ru.ptrff.motiondesk.engine.effects.BaseEffect;
+import ru.ptrff.motiondesk.engine.effects.WindEffect;
+import ru.ptrff.motiondesk.engine.scene.ImageActor;
+import ru.ptrff.motiondesk.models.ParameterField;
 
 public class JSONFormatter {
     static Gson gson = new Gson();
@@ -31,7 +46,7 @@ public class JSONFormatter {
             actorElement.add("height", toElement(actorHandler.getActorHeight()));
             actorElement.add("visibility", toElement(actorHandler.getVisibility()));
             actorElement.add("locked", toElement(actorHandler.getLockStatus()));
-            actorElement.add("masked", toElement(actorHandler.haveMask()));
+            //actorElement.add("masked", toElement(actorHandler.haveMask()));
 //            if(actorHandler.haveMask()){
 //                //addMask
 //            }
@@ -46,11 +61,11 @@ public class JSONFormatter {
         for (BaseEffect effect:effects){
             JsonObject actorElement = new JsonObject();
             actorElement.add("name", toElement(effect.getName()));
-            actorElement.add("type", toElement(effect.getType()));
-            if(effect.getType().equals("GlitchEffect")){
-                GlitchEffect glitchEffect = (GlitchEffect) effect;
-                actorElement.add("specificVars", toElement("specVars"));
-            }
+            actorElement.add("type_name", toElement(effect.getClass().getSimpleName()));
+            JsonArray parameters = new JsonArray();
+            for(ParameterField field:effect.getParameters())
+                parameters.add(toElement(field));
+            actorElement.add("parameters", parameters);
             array.add(actorElement);
         }
         return array;
@@ -60,14 +75,26 @@ public class JSONFormatter {
         return gson.toJsonTree(a);
     }
 
-    public static Array<ActorHandler> JsonArrayToActors(JsonArray jsonArray, List<Texture> textures){
+    public static Array<ActorHandler> JsonArrayToActors(JsonArray jsonArray, Context context){
         Array<ActorHandler> array = new Array<>();
-        int position = 0;
         for(JsonElement element:jsonArray){
             JsonObject object = element.getAsJsonObject();
-            Texture texture = textures.get(position);
-            ImageActor imageActor = new ImageActor(texture, object.get("name").getAsString());
+
+            String name = object.get("name").getAsString();
+
+            Bitmap bitmap = ProjectManager.getBitmapFromCurrentByName(context, name+".png");
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            Pixmap pixmap = new Pixmap(byteArray, 0, byteArray.length);
+
+            Texture texture = new Texture(pixmap);
+
+            ImageActor imageActor = new ImageActor(texture, name);
+
+
             ActorHandler actor = new ActorHandler(imageActor);
+
             actor.setActorPosition(
                     object.get("x").getAsFloat(),
                     object.get("y").getAsFloat()
@@ -85,13 +112,14 @@ public class JSONFormatter {
             actor.setLockStatus(
                     object.get("locked").getAsBoolean()
             );
-//            if(object.get("masked").getAsBoolean())
-                //SetMask
+            System.out.println(name+"  loaded");
+
+            //if(object.get("masked").getAsBoolean())
+
             if(!object.get("effects").getAsJsonArray().isEmpty()){
                 actor.addEffects(JsonArrayToEffects(object.get("effects").getAsJsonArray()));
             }
             array.add(actor);
-            position++;
         }
         return array;
     }
@@ -99,9 +127,36 @@ public class JSONFormatter {
     private static List<BaseEffect> JsonArrayToEffects(JsonArray jsonArray){
         List<BaseEffect> array = new ArrayList<>();
         for(JsonElement element:jsonArray) {
+            BaseEffect effect = null;
             JsonObject object = element.getAsJsonObject();
-            if(object.get("type").getAsString().equals("GlitchEffect")){
-                GlitchEffect effect = new GlitchEffect(object.get("name").getAsString());
+
+            String name = object.get("name").getAsString();
+
+            String typeName = object.get("type_name").getAsString();
+
+            JsonArray parameters = object.get("parameters").getAsJsonArray();
+            List<ParameterField> parametersList = new ArrayList<>();
+            for(JsonElement parameter:parameters){
+                parametersList.add(gson.fromJson(parameter, ParameterField.class));
+            }
+
+            if(typeName.equals("ParallaxEffect")){
+                effect = new ParallaxEffect(name, parametersList);
+            }
+
+            if(typeName.equals("GlitchEffect")){
+                effect = new GlitchEffect(name, parametersList);
+            }
+
+            if(typeName.equals("ShakeEffect")){
+                effect = new ShakeEffect(name, parametersList);
+            }
+
+            if(typeName.equals("WindEffect")){
+                effect = new WindEffect(name, parametersList);
+            }
+
+            if(effect!=null){
                 array.add(effect);
             }
         }

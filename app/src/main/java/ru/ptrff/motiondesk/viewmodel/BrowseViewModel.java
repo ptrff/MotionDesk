@@ -8,13 +8,11 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import ru.ptrff.motiondesk.adapters.WpprsAdapter;
-import ru.ptrff.motiondesk.data.BrowseSector;
-import ru.ptrff.motiondesk.data.WallpaperItem;
+import ru.ptrff.motiondesk.models.BrowseSector;
+import ru.ptrff.motiondesk.models.WallpaperItem;
 
 public class BrowseViewModel extends AndroidViewModel {
 

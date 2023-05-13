@@ -32,7 +32,7 @@ import com.squareup.picasso.Target;
 import java.io.File;
 
 import ru.ptrff.motiondesk.R;
-import ru.ptrff.motiondesk.data.WallpaperItem;
+import ru.ptrff.motiondesk.models.WallpaperItem;
 import ru.ptrff.motiondesk.databinding.FragmentInfoBinding;
 import ru.ptrff.motiondesk.utils.ProjectManager;
 
@@ -56,6 +56,8 @@ public class InfoFragment extends BottomSheetDialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentInfoBinding.inflate(inflater);
 
+        if(item.isLocal())
+            removePublicInfo();
         bindData();
         fillTags();
         fillTextData();
@@ -65,26 +67,32 @@ public class InfoFragment extends BottomSheetDialogFragment {
 
     @SuppressLint("ClickableViewAccessibility")
     private void bindData() {
-        String image = item.getImage();
-        if(image.equals("")) image = Uri.parse("android.resource://ru.ptrff.motiondesk/drawable/image_name").toString();
-        Picasso.get().load(image).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                binding.backrgoundImage.setImageBitmap(bitmap);
-                binding.shimmerView.stopShimmerAnimation();
-                binding.shimmerView.setVisibility(View.GONE);
-            }
+        if (!item.hasPreviewImage()) {
+            binding.backgroundImage.setImageDrawable(requireContext().getDrawable(R.drawable.no_image));
+            binding.shimmerView.setVisibility(View.GONE);
+        } else {
+            Picasso.get().load(ProjectManager.getPreviewById(requireContext(), item.getId())).into(new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    binding.backgroundImage.setImageBitmap(bitmap);
+                    binding.shimmerView.stopShimmerAnimation();
+                    binding.shimmerView.setVisibility(View.GONE);
+                }
 
-            @Override
-            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-            }
+                @Override
+                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                    binding.backgroundImage.setImageDrawable(requireContext().getDrawable(R.drawable.no_image));
+                    binding.shimmerView.stopShimmerAnimation();
+                    binding.shimmerView.setVisibility(View.GONE);
+                }
 
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                binding.shimmerView.setVisibility(View.VISIBLE);
-                binding.shimmerView.startShimmerAnimation();
-            }
-        });
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+                    binding.shimmerView.setVisibility(View.VISIBLE);
+                    binding.shimmerView.startShimmerAnimation();
+                }
+            });
+        }
 
         binding.edit.setOnClickListener(view -> {
             Intent i = new Intent(getActivity(), WallpaperEditor.class);
@@ -107,22 +115,24 @@ public class InfoFragment extends BottomSheetDialogFragment {
             dialog.show(getParentFragmentManager(), "rate");
         });
 
-        binding.backrgoundImage.setOnClickListener(view -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        binding.backgroundImage.setOnClickListener(view -> {
+            if(item.hasPreviewImage()) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
-            builder.setTitle("Предпросмотр картинки");
+                builder.setTitle("Предпросмотр картинки");
 
-            final ImageView imageView = new ImageView(getContext());
-            imageView.setImageDrawable(((ImageView)view).getDrawable());
-            imageView.setScaleType(ImageView.ScaleType.MATRIX);
-            imageView.setOnTouchListener(new ImageMatrixTouchHandler());
-            builder.setView(imageView);
+                final ImageView imageView = new ImageView(getContext());
+                imageView.setImageDrawable(((ImageView) view).getDrawable());
+                imageView.setScaleType(ImageView.ScaleType.MATRIX);
+                imageView.setOnTouchListener(new ImageMatrixTouchHandler());
+                builder.setView(imageView);
 
-            builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+                builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
 
-            AlertDialog dialog = builder.create();
-            dialog.getWindow().setBackgroundDrawableResource(R.drawable.rounded_bottom_dialog);
-            dialog.show();
+                AlertDialog dialog = builder.create();
+                dialog.getWindow().setBackgroundDrawableResource(R.drawable.rounded_bottom_dialog);
+                dialog.show();
+            }
         });
 
         binding.delete.setOnClickListener(view -> {
@@ -131,8 +141,7 @@ public class InfoFragment extends BottomSheetDialogFragment {
             builder.setMessage("Вы действительно хотите удалить эти обои?");
 
             builder.setPositiveButton("Да", (dialog, which) -> {
-                ProjectManager.removeProject(new File(
-                        ProjectManager.getProjectsDirectory(requireContext()).getPath()+"/"+item.getName()));
+                ProjectManager.removeProject(requireContext(), item.getId());
                 dialog.dismiss();
                 events.onWallpaperRemoved();
                 dismiss();
@@ -145,12 +154,30 @@ public class InfoFragment extends BottomSheetDialogFragment {
         });
     }
 
+    private void removePublicInfo(){
+        ((View) binding.stars.getParent()).setVisibility(View.GONE);
+        ((View) binding.downloads.getParent()).setVisibility(View.GONE);
+        binding.rate.setVisibility(View.GONE);
+    }
+
     private void fillTextData(){
         binding.name.setText(item.getName());
-        binding.author.setText(item.getAuthor());
+        if(item.isLocal())
+            binding.author.setText(R.string.you);
+        else
+            binding.author.setText(item.getAuthor());
         binding.description.setText(item.getDescription());
         binding.stars.setText(String.valueOf(item.getStars()));
-        binding.rating.setText(item.getRating());
+        binding.resolution.setText(item.getWidth()+"x"+item.getHeight());
+        binding.size.setText(ProjectManager.getProjectSize(requireContext(), item.getId()));
+
+        String rating = new String[]{
+                requireContext().getResources().getString(R.string.restriction_for_all),
+                requireContext().getResources().getString(R.string.restriction_16),
+                requireContext().getResources().getString(R.string.restriction_18)
+        }[item.getRating()];
+
+        binding.rating.setText(rating);
         binding.apply.setOnClickListener(click);
 
         TypedValue typedValue = new TypedValue();

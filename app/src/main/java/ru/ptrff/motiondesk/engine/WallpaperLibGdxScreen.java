@@ -2,11 +2,13 @@ package ru.ptrff.motiondesk.engine;
 
 import com.badlogic.gdx.Game;
 
-public class WallpaperLibGdxScreen extends Game {
-    private final WallpaperEditorEngine engine;
+import ru.ptrff.motiondesk.engine.scene.WallpaperEngineBase;
 
-    public WallpaperLibGdxScreen(WallpaperEditorEngine engine){
-        this.engine=engine;
+public class WallpaperLibGdxScreen extends Game {
+    private final WallpaperEngineBase engine;
+
+    public WallpaperLibGdxScreen(WallpaperEngineBase engine){
+        this.engine= engine;
     }
 
     @Override

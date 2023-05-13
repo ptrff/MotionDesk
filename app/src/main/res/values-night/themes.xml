@@ -21,8 +21,8 @@
         <!-- Unsorted -->
         <item name="foregroundBlackWhite">@color/white</item>
         <item name="backgroundBlackWhite">@color/black</item>
+        <item name="backgroundDarkLight">@color/dark</item>
         <item name="halfTransparentBg">@color/half_black</item>
-        <item name="backgroundDarkLight">@color/darker_blue_grey</item>
         <item name="bottomNavBarChecked">@color/ocra</item>
         <item name="bottomNavBarNotChecked">@color/gray</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>

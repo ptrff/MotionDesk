@@ -1,6 +1,7 @@
 package ru.ptrff.motiondesk.utils;
 
 import android.util.Log;
+import android.util.Pair;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -29,15 +30,15 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class ZipMaster {
-    private final Array<Texture> textures;
+    private final Array<Pair<Texture, String>> textures;
     private JsonObject scene;
 
     public ZipMaster() {
         textures = new Array<>();
     }
 
-    public void addTexture(Texture texture) {
-        textures.add(texture);
+    public void addTexture(Texture texture, String name) {
+        textures.add(new Pair<>(texture, name));
     }
 
     public void setSceneJson(JsonObject sceneJson){
@@ -56,8 +57,9 @@ public class ZipMaster {
             zipOutputStream.closeEntry();
 
             Pixmap pixmap;
-            for (Texture texture : textures) {
-                String entryName = String.valueOf(textures.indexOf(texture, false));
+            for (Pair<Texture, String> textureAndName : textures) {
+                Texture texture = textureAndName.first;
+                String textureName = textureAndName.second;
 
                 TextureData textureData = texture.getTextureData();
                 if (!textureData.isPrepared()) {
@@ -65,10 +67,10 @@ public class ZipMaster {
                 }
                 pixmap = textureData.consumePixmap();
 
-                FileHandle fileHandle = new FileHandle(filePath.replace("scene.zip", "")+entryName);
+                FileHandle fileHandle = new FileHandle(filePath.replace("scene.zip", "")+textureName);
                 PixmapIO.writePNG(fileHandle, pixmap);
 
-                zipOutputStream.putNextEntry(new ZipEntry(entryName + ".png"));
+                zipOutputStream.putNextEntry(new ZipEntry(textureName + ".png"));
                 byte[] pngData = fileHandle.readBytes();
                 zipOutputStream.write(pngData);
                 zipOutputStream.closeEntry();
@@ -103,7 +105,7 @@ public class ZipMaster {
                     byte[] textureData = readEntryData(zipInputStream, (int) entry.getSize());
                     Pixmap texturePixmap = new Pixmap(textureData, 0, textureData.length);
                     Texture texture = new Texture(texturePixmap);
-                    textures.add(texture);
+                    textures.add(new Pair<>(texture, entryName.replace(".png", "")));
                     texturePixmap.dispose();
                 }
                 zipInputStream.closeEntry();

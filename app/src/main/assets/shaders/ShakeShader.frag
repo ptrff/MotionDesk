@@ -1,45 +1,34 @@
 #ifdef GL_ES
 #define PRECISION mediump
 precision PRECISION float;
-precision PRECISION int;
 #else
 #define PRECISION
 #endif
 
 varying vec2 v_texCoords;
 uniform sampler2D u_texture;
-uniform sampler2D u_mask;
-uniform int u_rotation;
+uniform float u_rotation;
+uniform float u_speed;
 uniform float u_amount;
 uniform float u_time;
-
 
 void main()
 {
 	vec2 uv = v_texCoords;
 
-	// Translate to origin and apply rotation
-	float angle = radians(float(u_rotation));
-	mat2 rotationMatrix = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-	uv = rotationMatrix * (uv - 0.5) + 0.5;
+	// Convert rotation angle to radians
+	float rad = radians(u_rotation);
 
-	// Apply linear wave-like animation
-	float animationAmount = (1.0 - texture2D(u_mask, uv).r) * u_amount;
-	uv.y += sin(uv.x * 10.0 + u_time * 3.0) / 10.0 * animationAmount;
-	uv.x += cos(uv.y * 10.0 + u_time * 3.0) / 10.0 * animationAmount;
-	uv.y -= sin(uv.x * 10.0 + u_time * 3.0) / 10.0 * animationAmount;
+	// Calculate sin and cos of the angle
+	float sinAngle = sin(rad);
+	float cosAngle = cos(rad);
 
-	// Translate back to original position and apply movement amount
-	uv = (uv - 0.5) * (1.0 + u_amount) + 0.5;
+	// Calculate the amount of shaking based on time and the u_amount uniform
+	float shaking = u_amount * sin(u_speed * u_time * 100.0);
 
-	// Sample texture color
-	vec4 textureColor = texture2D(u_texture, uv);
+	// Calculate the UV coordinates for the shaken texture
+	vec2 shakenUV = vec2(uv.x + shaking * cosAngle, uv.y + shaking * sinAngle);
 
-	// Apply mask as a multiplier to the texture color
-	vec4 mask = texture2D(u_mask, uv);
-	float grayscale = dot(mask.rgb, vec3(0.299, 0.587, 0.114));
-	float maskAmount = smoothstep(0.0, 1.0, grayscale);
-	vec4 maskedColor = textureColor * maskAmount;
-
-	gl_FragColor = mix(textureColor, maskedColor, maskAmount);
+	// Get the texture color at the modified UV coordinates and set it as the output color
+	gl_FragColor = texture2D(u_texture, shakenUV);
 }

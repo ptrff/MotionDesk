@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class IDGenerator {
+public class IDGenerator { //TODO move to one class and remake
     private static final int ID_LENGTH = 9;
     public static final Set<String> usedIDs = new HashSet<>();
 

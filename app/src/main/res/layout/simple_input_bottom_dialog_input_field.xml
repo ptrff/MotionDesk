@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.textfield.TextInputLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/input_field_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:boxBackgroundMode="outline"
+    app:boxCornerRadiusBottomEnd="@dimen/card_corners"
+    app:boxCornerRadiusBottomStart="@dimen/card_corners"
+    app:boxCornerRadiusTopEnd="@dimen/card_corners"
+    app:boxCornerRadiusTopStart="@dimen/card_corners"
+    app:expandedHintEnabled="true"
+    app:hintAnimationEnabled="true"
+    app:hintEnabled="true">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/input_field"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/field_height"
+        android:backgroundTint="?backgroundBlackWhite"
+        android:imeOptions="actionNext"
+        android:inputType="text"
+        android:maxLines="1"
+        android:padding="@dimen/distance_l"
+        android:singleLine="true"
+        android:textColor="?foregroundBlackWhite" />
+
+</com.google.android.material.textfield.TextInputLayout>

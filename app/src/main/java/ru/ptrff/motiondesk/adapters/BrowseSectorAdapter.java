@@ -14,15 +14,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.flexbox.FlexDirection;
-import com.google.android.flexbox.FlexboxLayoutManager;
-import com.google.android.flexbox.JustifyContent;
-
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import ru.ptrff.motiondesk.data.BrowseSector;
+import ru.ptrff.motiondesk.models.BrowseSector;
 import ru.ptrff.motiondesk.databinding.BrowseSectorBinding;
 
 public class BrowseSectorAdapter extends RecyclerView.Adapter<BrowseSectorAdapter.ViewHolder> {

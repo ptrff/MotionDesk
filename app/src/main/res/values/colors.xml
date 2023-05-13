@@ -12,12 +12,13 @@
     <color name="gray">#676767</color>
     <color name="red">#A31E15</color>
     <color name="black">#121212</color>
+    <color name="dark">#181818</color>
     <color name="true_black">#000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="light">#F5F5F5</color>
     <color name="half_white">#EEFFFFFF</color>
     <color name="half_black">#EE121212</color>
     <color name="transparent">#00000000</color>
-
     <color name="darker_blue_grey">#22223B</color>
     <color name="darker_red">#3B2222</color>
     <color name="blue_grey">#4A4E69</color>
