@@ -10,6 +10,3 @@
   <br/>
   <br/>
 </p>
-
-
-![https://github.com/ptrff/MotionDesk/releases/download/1.0.0/MotionDesk.v1.apk](https://img.shields.io/github/downloads/ptrff/MotionDesk/total)
