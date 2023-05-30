@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/distance_l"
+    android:background="@drawable/rounded_bottom_dialog"
+    android:orientation="vertical"
+    android:padding="@dimen/distance_l"
+    android:theme="@style/Theme.MotionDesk">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/distance_m"
+        android:gravity="center"
+        android:textColor="?foregroundBlackWhite"
+        android:text="@string/choose_color"
+        android:textSize="18sp" />
+
+    <com.jaredrummler.android.colorpicker.ColorPickerView
+        android:id="@+id/color_picker"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginBottom="@dimen/distance_m" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/cancel"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/field_height"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_outline_button"
+            android:backgroundTint="@color/red"
+            android:text="@string/cancel"
+            android:textColor="@color/red" />
+
+        <Space
+            android:id="@+id/buttons_space"
+            android:layout_width="@dimen/distance_l"
+            android:layout_height="wrap_content" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/apply"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/field_height"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_outline_button"
+            android:backgroundTint="?colorAccent"
+            android:text="@string/choose"
+            android:textColor="?colorAccent" />
+
+    </LinearLayout>
+
+</LinearLayout>

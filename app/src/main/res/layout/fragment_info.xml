@@ -259,7 +259,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
-                        android:text="Теги:"
+                        android:text="@string/tags"
                         android:textColor="?colorPrimaryVariant" />
                 </LinearLayout>
 
@@ -303,7 +303,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
-                        android:text="Описание:"
+                        android:text="@string/description_colon"
                         android:textColor="?colorPrimaryVariant" />
                 </LinearLayout>
 
@@ -344,13 +344,13 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/apply"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="50dp"
                     android:layout_marginEnd="15dp"
                     android:layout_weight="1"
                     android:background="@drawable/rounded_outline_button"
                     android:backgroundTint="?colorAccent"
-                    android:text="Применить"
+                    android:text="@string/apply"
                     android:textColor="?colorAccent" />
 
                 <ImageButton

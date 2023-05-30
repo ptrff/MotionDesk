@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -215,7 +216,7 @@ public class ProjectInfoFragment extends BottomSheetDialogFragment {
         if(!binding.width.getText().toString().equals("")) width = Integer.parseInt(binding.width.getText().toString());
         if(!binding.height.getText().toString().equals("")) height = Integer.parseInt(binding.height.getText().toString());
         if(!binding.description.getText().toString().equals("")) description = binding.description.getText().toString();
-        if(Validation.checkString(name, description)&&width>=640&&width<=9000&&height>=640&&height<=9000) {
+        if(Validation.checkString(name)&&width>=640&&width<=9000&&height>=640&&height<=9000) {
             item.setName(name);
             item.setWidth(width);
             item.setHeight(height);
@@ -224,14 +225,20 @@ public class ProjectInfoFragment extends BottomSheetDialogFragment {
 
             Set<String> tags = new HashSet<>();
             for (int i = 0; i < binding.tags.getChildCount(); i++) {
-                if(binding.tags.getChildAt(i) instanceof EditText){
-                    String text = ((EditText) binding.tags.getChildAt(i)).getText().toString();
-                    if(Validation.checkString(text)) {
-                        tags.add(text);
+                if(binding.tags.getChildAt(i) instanceof LinearLayout){
+                    LinearLayout tagView = (LinearLayout) binding.tags.getChildAt(i);
+                    if((tagView.getChildAt(0) instanceof EditText)) {
+                        String text = ((EditText) tagView.getChildAt(0)).getText().toString();
+                        if (Validation.checkString(text)) {
+                            tags.add(text);
+                        }
                     }
                 }
             }
+
             item.setTags(new ArrayList<>(tags));
+
+            Log.i("fddsfds", item.getTags().toString());
 
             if(newImage!=null) {
                 item.setHasPreviewImage(true);
@@ -240,8 +247,9 @@ public class ProjectInfoFragment extends BottomSheetDialogFragment {
 
             events.onProjectInfoChanged();
             dismiss();
-        }else
+        }else {
             Snackbar.make(binding.getRoot(), R.string.fields_filling_error, BaseTransientBottomBar.LENGTH_SHORT).show();
+        }
     }
 
     @NonNull

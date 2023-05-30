@@ -161,14 +161,6 @@ public class ProjectManager {
         }
     }
 
-    public static void unpackProjectToTemp(Context context, String id) {
-        File targetDir = new File(getRootDirectory(context), TEMP_DIR_NAME);
-        if (!targetDir.exists()) {
-            targetDir.mkdir();
-        }
-        unpackProject(context, id, targetDir);
-    }
-
     @SuppressLint("DefaultLocale")
     public static String getProjectSize(Context context, String id){
         File file = new File(getProjectsDirectory(context)+"/"+id);
@@ -187,11 +179,22 @@ public class ProjectManager {
         return hrSize;
     }
 
-    public static void unpackProjectToCurrent(Context context, String id) {
-        File targetDir = new File(getRootDirectory(context), CURRENT_DIR_NAME);
+    public static void unpackProjectToFolder(Context context, String id, String folderName) {
+        File targetDir = new File(getRootDirectory(context), folderName);
         if (!targetDir.exists()) {
             targetDir.mkdir();
+        }else {
+            File[] files = targetDir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    boolean success = file.delete();
+                    if (!success) {
+                        Log.e(TAG, "Error deleting file "+file);
+                    }
+                }
+            }
         }
+
         unpackProject(context, id, targetDir);
     }
 
@@ -246,22 +249,12 @@ public class ProjectManager {
         return new File(getProjectsDirectory(context), id);
     }
 
-//    public static String getSceneJsonObject(String id)  {
-//        File wallpaperFile = new File(getProjectsDirectory(context), id, "scene.json");
-//        try (FileInputStream inputStream = new FileInputStream(wallpaperFile)) {
-//            InputStreamReader streamReader = new InputStreamReader(inputStream);
-//            BufferedReader reader = new BufferedReader(streamReader);
-//            StringBuilder stringBuilder = new StringBuilder();
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                stringBuilder.append(line);
-//            }
-//            return stringBuilder.toString();
-//        }
-//    }
+    public static boolean projectExists(Context context, String id) {
+        return (new File(getProjectsDirectory(context), id)).exists();
+    }
 
-    public static JsonObject getSceneJsonFromCurrent(Context context) {
-        File sceneFile = new File(getCurrentDirectory(context), "scene.json");
+    public static JsonObject getSceneJsonFromFolder(Context context, String folderName) {
+        File sceneFile = new File(new File(getRootDirectory(context), folderName), "scene.json");
         try {
             FileReader fileReader = new FileReader(sceneFile);
             Gson gson = new Gson();
@@ -269,7 +262,7 @@ public class ProjectManager {
             fileReader.close();
             return object;
         } catch (IOException e){
-            Log.e(TAG, "scene.json reading error for current");
+            Log.e(TAG, "scene.json reading error for "+sceneFile.getAbsolutePath());
             return null;
         }
     }
@@ -288,8 +281,8 @@ public class ProjectManager {
         }
     }
 
-    public static Bitmap getBitmapFromCurrentByName(Context context, String name){
-        File file = new File(getCurrentDirectory(context), name);
+    public static Bitmap getBitmapFromFolderByName(Context context, String name, String folderName){
+        File file = new File(new File(getRootDirectory(context), folderName), name);
         if (!file.exists()) {
             return null;
         }
@@ -297,11 +290,6 @@ public class ProjectManager {
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
         return bitmap;
-    }
-
-    public static Uri getPreviewUri(File projectDir) {
-        File previewFile = new File(projectDir, "preview.jpg");
-        return Uri.fromFile(previewFile);
     }
 
     public static File getPreviewById(Context context, String id){

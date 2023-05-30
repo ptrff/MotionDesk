@@ -116,7 +116,7 @@ public class ShakeEffect extends BaseEffect {
     @Override
     public void update(float delta) {
         super.update(delta);
-        if(time*1.4*speed>=2*PI) setTime(0);
+        if(time*1.4*speed>=10*PI) setTime(0);
         else setTime(time + delta);
     }
 

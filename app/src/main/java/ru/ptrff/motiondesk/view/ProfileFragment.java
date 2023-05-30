@@ -3,6 +3,7 @@ package ru.ptrff.motiondesk.view;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.transition.Explode;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,6 +25,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.databinding.FragmentProfileBinding;
@@ -55,37 +60,27 @@ public class ProfileFragment extends Fragment {
         setupActionBarButtons();
         setupPullToRefresh();
         observeContent();
-        generateWhileScrolling();
 
         return binding.getRoot();
     }
 
 
-    private void generateWhileScrolling() {
-        binding.profileRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if(sGrid.findFirstVisibleItemPosition()!=viewModel.getScrollPosition().getValue()){
-                    viewModel.init(sGrid.findLastVisibleItemPosition());
-                }
-            }
-        });
-    }
-
-
     private void observeContent(){
         viewModel.getItemsLiveData().observe(getViewLifecycleOwner(), wallpaperItems -> {
-            adapter.notifyItemInserted(wallpaperItems.size());
+            adapter.submitList(wallpaperItems);
         });
     }
 
     private void setupPullToRefresh() {
-        final SwipeRefreshLayout pullToRefresh = binding.profileRefresh;
-        pullToRefresh.setOnRefreshListener(() -> {
-            viewModel.init(15);
-            pullToRefresh.setRefreshing(false);
-        });
+        Resources.Theme theme = requireActivity().getTheme();
+        TypedValue foregroundValue = new TypedValue();
+        TypedValue backgroundValue = new TypedValue();
+        theme.resolveAttribute(R.attr.foregroundBlackWhite, foregroundValue, false);
+        theme.resolveAttribute(R.attr.backgroundDarkLight, backgroundValue, false);
+        binding.profileRefresh.setColorSchemeResources(foregroundValue.data);
+        binding.profileRefresh.setProgressBackgroundColorSchemeResource(backgroundValue.data);
+
+        binding.profileRefresh.setOnRefreshListener(() -> binding.profileRefresh.setRefreshing(false));
     }
 
     private void setupActionBarButtons() {
@@ -124,31 +119,18 @@ public class ProfileFragment extends Fragment {
     }
 
     private void applyGridToAdapter(){
-        sGrid = new GridLayoutManager(getContext(), calculateColumnCount());
+        sGrid = new GridLayoutManager(requireContext(), calculateColumnCount());
         binding.profileRecycler.setLayoutManager(sGrid);
         binding.profileRecycler.setAdapter(adapter);
-        binding.profileRecycler.scrollToPosition(viewModel.getScrollPosition().getValue());
     }
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        viewModel.setScrollPosition(sGrid.findFirstVisibleItemPosition());
         applyGridToAdapter();
     }
 
     public OnItemClickListener itemClick = (item, position) -> {
-        InfoFragment infoFragment = new InfoFragment(item, null);
-        infoFragment.setButtonOnClickListener(view -> {
-            startPreview(item);
-        });
-        infoFragment.show(requireActivity().getSupportFragmentManager(), "Info");
+        Snackbar.make(binding.getRoot(), "В скором времени..", BaseTransientBottomBar.LENGTH_SHORT).show();
     };
-
-    private void startPreview(WallpaperItem item) {
-        Intent i = new Intent(getActivity(), WallpaperPreview.class);
-        i.putExtra("Name", item.getAuthor());
-        requireActivity().getWindow().setExitTransition(new Explode());
-        startActivity(i);
-    }
 }

@@ -66,7 +66,7 @@ public class ToolbarAdapter extends ListAdapter<ToolItem, ToolbarAdapter.ToolIte
 
         @Override
         public void onClick(View v) {
-            int position = getAdapterPosition();
+            int position = getBindingAdapterPosition();
             if (listener != null && position != RecyclerView.NO_POSITION) {
                 listener.onImageClick(getItem(position));
             }

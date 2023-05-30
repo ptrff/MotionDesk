@@ -2,6 +2,8 @@ package ru.ptrff.motiondesk.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
+import android.util.Pair;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -29,6 +31,7 @@ import ru.ptrff.motiondesk.engine.effects.BaseEffect;
 import ru.ptrff.motiondesk.engine.effects.WindEffect;
 import ru.ptrff.motiondesk.engine.scene.ImageActor;
 import ru.ptrff.motiondesk.models.ParameterField;
+import ru.ptrff.motiondesk.models.SceneParameters;
 
 public class JSONFormatter {
     static Gson gson = new Gson();
@@ -46,14 +49,14 @@ public class JSONFormatter {
             actorElement.add("height", toElement(actorHandler.getActorHeight()));
             actorElement.add("visibility", toElement(actorHandler.getVisibility()));
             actorElement.add("locked", toElement(actorHandler.getLockStatus()));
-            //actorElement.add("masked", toElement(actorHandler.haveMask()));
-//            if(actorHandler.haveMask()){
-//                //addMask
-//            }
             actorElement.add("effects", effectsToJsonArray(actorHandler.getEffects()));
             array.add(actorElement);
         }
         return array;
+    }
+
+    public static SceneParameters getSceneParametersFromJson(JsonObject jsonObject){
+        return gson.fromJson(jsonObject, SceneParameters.class);
     }
 
     private static JsonElement effectsToJsonArray(List<BaseEffect> effects){
@@ -62,6 +65,7 @@ public class JSONFormatter {
             JsonObject actorElement = new JsonObject();
             actorElement.add("name", toElement(effect.getName()));
             actorElement.add("type_name", toElement(effect.getClass().getSimpleName()));
+            actorElement.add("disabled", toElement(effect.isDisabled()));
             JsonArray parameters = new JsonArray();
             for(ParameterField field:effect.getParameters())
                 parameters.add(toElement(field));
@@ -75,56 +79,31 @@ public class JSONFormatter {
         return gson.toJsonTree(a);
     }
 
-    public static Array<ActorHandler> JsonArrayToActors(JsonArray jsonArray, Context context){
-        Array<ActorHandler> array = new Array<>();
+    public static Array<Pair<Pixmap, JsonObject>> JsonArrayToPairs(JsonArray jsonArray, Context context, String folderName){
+        Array<Pair<Pixmap, JsonObject>> pairs = new Array<>();
         for(JsonElement element:jsonArray){
+
             JsonObject object = element.getAsJsonObject();
 
             String name = object.get("name").getAsString();
-
-            Bitmap bitmap = ProjectManager.getBitmapFromCurrentByName(context, name+".png");
+            Log.i("JSONFormatter", "getting "+name+" texture");
+            Bitmap bitmap = ProjectManager.getBitmapFromFolderByName(context, name+".png", folderName);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
-            Pixmap pixmap = new Pixmap(byteArray, 0, byteArray.length);
 
-            Texture texture = new Texture(pixmap);
-
-            ImageActor imageActor = new ImageActor(texture, name);
-
-
-            ActorHandler actor = new ActorHandler(imageActor);
-
-            actor.setActorPosition(
-                    object.get("x").getAsFloat(),
-                    object.get("y").getAsFloat()
+            Pair<Pixmap, JsonObject> pair = new Pair<>(
+                    new Pixmap(byteArray, 0, byteArray.length),
+                    object
             );
-            actor.setActorRotation(
-                    object.get("rotation").getAsFloat()
-            );
-            actor.setActorSize(
-                    object.get("width").getAsFloat(),
-                    object.get("height").getAsFloat()
-            );
-            actor.setVisibility(
-                    object.get("visibility").getAsBoolean()
-            );
-            actor.setLockStatus(
-                    object.get("locked").getAsBoolean()
-            );
-            System.out.println(name+"  loaded");
 
-            //if(object.get("masked").getAsBoolean())
+            pairs.add(pair);
 
-            if(!object.get("effects").getAsJsonArray().isEmpty()){
-                actor.addEffects(JsonArrayToEffects(object.get("effects").getAsJsonArray()));
-            }
-            array.add(actor);
         }
-        return array;
+        return pairs;
     }
 
-    private static List<BaseEffect> JsonArrayToEffects(JsonArray jsonArray){
+    public static List<BaseEffect> JsonArrayToEffects(JsonArray jsonArray){
         List<BaseEffect> array = new ArrayList<>();
         for(JsonElement element:jsonArray) {
             BaseEffect effect = null;
@@ -133,6 +112,8 @@ public class JSONFormatter {
             String name = object.get("name").getAsString();
 
             String typeName = object.get("type_name").getAsString();
+
+            boolean disabled = object.get("disabled").getAsBoolean();
 
             JsonArray parameters = object.get("parameters").getAsJsonArray();
             List<ParameterField> parametersList = new ArrayList<>();
@@ -157,6 +138,7 @@ public class JSONFormatter {
             }
 
             if(effect!=null){
+                effect.setDisabled(disabled);
                 array.add(effect);
             }
         }

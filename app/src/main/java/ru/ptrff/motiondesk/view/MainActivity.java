@@ -8,12 +8,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.view.View;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.google.android.material.appbar.AppBarLayout;
 
-import ru.ptrff.motiondesk.utils.Converter;
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.databinding.ActivityMainBinding;
 import ru.ptrff.motiondesk.viewmodel.MainViewModel;
@@ -33,8 +30,6 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
-
-        new Converter(getResources().getDisplayMetrics().density);
 
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 

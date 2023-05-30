@@ -30,6 +30,8 @@ import androidx.annotation.NonNull;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.databinding.FragmentCreateProjectBinding;
@@ -175,20 +177,24 @@ public class CreateProjectFragment extends BottomSheetDialogFragment {
             recolorNext(true);
         });
         binding.typeGif.setOnClickListener(view -> {
-            binding.typeScene2d.setChecked(false);
+            /*binding.typeScene2d.setChecked(false);
             binding.typeGif.setChecked(true);
             binding.typeWeb.setChecked(false);
             binding.shortType.setImageResource(R.drawable.ic_image);
             typeChecked = true;
-            recolorNext(true);
+            recolorNext(true);*/
+            binding.typeGif.setChecked(false);
+            Snackbar.make(binding.getRoot(), "В скором времени..", BaseTransientBottomBar.LENGTH_SHORT).show();
         });
         binding.typeWeb.setOnClickListener(view -> {
-            binding.typeScene2d.setChecked(false);
+            /*binding.typeScene2d.setChecked(false);
             binding.typeGif.setChecked(false);
             binding.typeWeb.setChecked(true);
             binding.shortType.setImageResource(R.drawable.ic_code);
             typeChecked = true;
-            recolorNext(true);
+            recolorNext(true);*/
+            binding.typeWeb.setChecked(false);
+            Snackbar.make(binding.getRoot(), "В скором времени..", BaseTransientBottomBar.LENGTH_SHORT).show();
         });
         binding.nextButton.setOnClickListener(view -> {
             if (typeChecked && !animating) {

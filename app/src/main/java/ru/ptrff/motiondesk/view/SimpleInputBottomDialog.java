@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -24,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.DialogFragment;
 
+import com.badlogic.gdx.graphics.Color;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -36,7 +36,6 @@ import java.util.Objects;
 
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.models.ParameterField;
-import ru.ptrff.motiondesk.utils.Converter;
 import ru.ptrff.motiondesk.utils.Validation;
 
 public class SimpleInputBottomDialog extends BottomSheetDialogFragment {
@@ -47,6 +46,7 @@ public class SimpleInputBottomDialog extends BottomSheetDialogFragment {
     private ParameterFieldCallback parameterFieldCallback;
     private ImageButtonCallback imageButtonCallback;
     private InputFieldCallback inputFieldCallback;
+    private ColorPickerCallback colorPickerCallback;
 
     public SimpleInputBottomDialog(Context context) {
         int distance_l = (int) TypedValue.applyDimension(
@@ -142,7 +142,11 @@ public class SimpleInputBottomDialog extends BottomSheetDialogFragment {
 
             View view = new View(context);
             view.setLayoutParams(new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, Converter.dpToPx(1)));
+                    ViewGroup.LayoutParams.MATCH_PARENT, (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    1,
+                    context.getResources().getDisplayMetrics()
+            )));
             view.setBackgroundColor(accentColor);
             view.setPadding(2, 0, 2, 0);
 
@@ -155,7 +159,20 @@ public class SimpleInputBottomDialog extends BottomSheetDialogFragment {
             View view = LayoutInflater.from(context).inflate(R.layout.simple_input_bottom_dialog_input_field, null);
             TextInputEditText editText = view.findViewById(R.id.input_field);
             TextInputLayout inputLayout = view.findViewById(R.id.input_field_layout);
-            inputLayout.setHint(hint + "  (" + min + " - " + max + ")");
+            String minVal;
+            String maxVal;
+            if(Integer.parseInt(min.toString()) == Integer.MIN_VALUE){
+                minVal = "-∞";
+            }else {
+                minVal = min.toString();
+            }
+            if(Integer.parseInt(max.toString()) == Integer.MAX_VALUE){
+                maxVal = "∞";
+            }else {
+                maxVal = max.toString();
+            }
+            inputLayout.setHint(hint + "  (" + minVal + "; " + maxVal + ")");
+
 
 
             int inputType = InputType.TYPE_CLASS_TEXT;
@@ -167,6 +184,22 @@ public class SimpleInputBottomDialog extends BottomSheetDialogFragment {
                 editText.setText(Float.parseFloat(value.toString()) + "");
                 inputType = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL;
             }
+            if (type.equals("string")) {
+                editText.setText(value.toString());
+            }
+            if (type.equals("color")) {
+                editText.setText(String.format("#%06X", (0xFFFFFF & ((Color) value).toIntBits())));
+
+                inputLayout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
+                inputLayout.setEndIconDrawable(R.drawable.ic_pick_color);
+                inputLayout.setHint(hint);
+
+
+                inputLayout.setEndIconOnClickListener(v -> {
+                    dialog.colorPickerCallback.showColorPickerDialog(editText);
+                });
+            }
+
             if ((min + "").toCharArray()[0] == '-') {
                 inputType = inputType | InputType.TYPE_NUMBER_FLAG_SIGNED;
             }
@@ -219,13 +252,20 @@ public class SimpleInputBottomDialog extends BottomSheetDialogFragment {
 
 
             int inputType = InputType.TYPE_CLASS_TEXT;
-            if (parameter.getType().equals("int"))
+            if (parameter.getType().equals("int")) {
                 inputType = InputType.TYPE_CLASS_NUMBER;
-            if (parameter.getType().equals("float"))
+            }
+            if (parameter.getType().equals("float")) {
                 inputType = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL;
+            }
+            if (parameter.getType().equals("color")) {
+                editText.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_pick_color, 0);
+            }
 
-            if (parameter.getMin().toString().toCharArray()[0] == '-')
+
+            if (parameter.getMin().toString().toCharArray()[0] == '-') {
                 inputType = inputType | InputType.TYPE_NUMBER_FLAG_SIGNED;
+            }
 
             editText.setInputType(inputType);
 
@@ -323,11 +363,19 @@ public class SimpleInputBottomDialog extends BottomSheetDialogFragment {
         this.imageButtonCallback = callback;
     }
 
+    public void setColorPickerCallback(ColorPickerCallback callback) {
+        this.colorPickerCallback = callback;
+    }
+
+    public interface ColorPickerCallback {
+        void showColorPickerDialog(TextInputEditText editText);
+    }
+
     public interface ParameterFieldCallback {
         void onParameterFieldChanged(ParameterField field);
     }
 
-    public interface InputFieldCallback{
+    public interface InputFieldCallback {
         void onInputFieldChanged(String typeName, Object value);
     }
 

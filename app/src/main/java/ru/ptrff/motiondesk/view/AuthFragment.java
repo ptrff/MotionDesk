@@ -2,7 +2,6 @@ package ru.ptrff.motiondesk.view;
 
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -24,10 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -35,11 +32,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ru.ptrff.motiondesk.R;
-import ru.ptrff.motiondesk.adapters.BrowseSectorAdapter;
 import ru.ptrff.motiondesk.databinding.FragmentAuthBinding;
 import ru.ptrff.motiondesk.databinding.StateViewBinding;
-import ru.ptrff.motiondesk.utils.Converter;
-import ru.ptrff.motiondesk.viewmodel.BrowseViewModel;
 
 public class AuthFragment extends Fragment {
 
@@ -94,7 +88,7 @@ public class AuthFragment extends Fragment {
 
                 dialogBinding.title.setText("Восстановление доступа");
                 dialogBinding.description.setText("Вы точно хотите сбросить пароль аккаунта?");
-                dialogBinding.image.setImageResource(R.drawable.test_mascot);
+                dialogBinding.image.setVisibility(View.GONE);
                 dialogBinding.button.setText("Нет");
                 dialogBinding.button.setBackgroundTintList(ColorStateList.valueOf(requireContext().getColor(R.color.red)));
                 dialogBinding.button.setTextColor(ColorStateList.valueOf(requireContext().getColor(R.color.red)));
@@ -289,7 +283,11 @@ public class AuthFragment extends Fragment {
         Display display = requireActivity().getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        int windowSize = Converter.dpToPx(150);
+        int windowSize = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                150,
+                getResources().getDisplayMetrics()
+        );
 
         LinearLayout rootView = new LinearLayout(requireContext());
         rootView.setGravity(Gravity.CENTER);

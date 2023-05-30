@@ -5,17 +5,21 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.ColorSpace;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.transition.Explode;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,6 +36,8 @@ import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
+import com.jaredrummler.android.colorpicker.ColorPickerDialog;
+import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
 
 import java.util.Objects;
 
@@ -43,12 +49,14 @@ import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.adapters.EffectsListAdapter;
 import ru.ptrff.motiondesk.adapters.ToolbarAdapter;
 import ru.ptrff.motiondesk.databinding.ActivityWallpaperEditorBinding;
+import ru.ptrff.motiondesk.databinding.ColorPickerViewBinding;
 import ru.ptrff.motiondesk.databinding.StateViewBinding;
 import ru.ptrff.motiondesk.engine.WallpaperLibGdxFragment;
 import ru.ptrff.motiondesk.engine.effects.BaseEffect;
 import ru.ptrff.motiondesk.engine.scene.ActorHandler;
 import ru.ptrff.motiondesk.engine.scene.EngineEventsListener;
 import ru.ptrff.motiondesk.engine.scene.WallpaperEditorEngine;
+import ru.ptrff.motiondesk.engine.scene.WallpaperEngine;
 import ru.ptrff.motiondesk.models.WallpaperItem;
 import ru.ptrff.motiondesk.utils.BitmapProcessor;
 import ru.ptrff.motiondesk.viewmodel.EditorViewModel;
@@ -84,10 +92,16 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
             viewModel.setWidth(getIntent().getIntExtra("Width", 1080));
             viewModel.setName(getIntent().getStringExtra("Name"));
             viewModel.createNewWallpaperItem();
-        } else
-            viewModel.loadWallpaperItem((WallpaperItem) getIntent().getSerializableExtra("wallpaper_item"));
+            engine = new WallpaperEditorEngine(viewModel.getWidth(), viewModel.getHeight(), this);
+        } else {
+            WallpaperItem wallpaperItem = (WallpaperItem) getIntent().getSerializableExtra("wallpaper_item");
+            viewModel.loadWallpaperItem(wallpaperItem);
+            engine = new WallpaperEditorEngine(wallpaperItem, wallpaperItem.getId(), this, this);
+        }
 
-        loadEditorEngine();
+        setupEditorEngine();
+
+        binding.loadingIndicator.startShimmerAnimation();
 
         observeContent();
 
@@ -104,25 +118,14 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
     }
 
     @SuppressLint("CheckResult")
-    public void loadEditorEngine() {
-        Observable
-                .just(new WallpaperEditorEngine(viewModel.getWidth(), viewModel.getHeight(), this))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(engine -> {
-                    this.engine = engine;
-                    viewModel.setEngine(engine);
-                    setupEnvironment(engine);
-                    engine.setResources(getResources());
-                    WallpaperLibGdxFragment libgdxFragment = new WallpaperLibGdxFragment(engine);
-                    getSupportFragmentManager().beginTransaction().
-                            add(R.id.preview, libgdxFragment).
-                            commit();
-
-                }, throwable -> {
-                    snackMessage(getString(R.string.error_creating_editor), binding.getRoot());
-                    Log.e("EditorViewModel", getString(R.string.error_creating_editor), throwable);
-                });
+    public void setupEditorEngine() {
+        viewModel.setEngine(engine);
+        setupEnvironment(engine);
+        engine.setResources(getResources());
+        WallpaperLibGdxFragment libgdxFragment = new WallpaperLibGdxFragment(engine);
+        getSupportFragmentManager().beginTransaction().
+                add(R.id.preview, libgdxFragment).
+                commit();
     }
 
     private void setupEnvironment(WallpaperEditorEngine engine) {
@@ -140,8 +143,6 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
                 viewModel.onProjectInfoChanged();
             }
         });
-
-        viewModel.getLoadingState().postValue(false);
     }
 
     @SuppressLint("CheckResult")
@@ -159,7 +160,15 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
         });
 
         viewModel.getSnackMessageLiveData().observe(this,
-                snackMessage -> snackMessage(snackMessage, binding.getRoot())
+                message -> {
+                    snackMessage(message, binding.getRoot());
+                }
+        );
+
+        viewModel.getToastMessageLiveData().observe(this,
+                message -> {
+                    Toast.makeText(WallpaperEditor.this, message, Toast.LENGTH_SHORT).show();
+                }
         );
 
         viewModel.getAppBarTextLiveData().observe(this, appBarText -> {
@@ -200,7 +209,6 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
         });
 
         viewModel.getCurrentBottomContentLiveData().observe(this, currentBottomContent -> {
-            System.out.println("WAWALWALLWAWA");
             if (currentBottomContent.equals("layers")) {
                 selectBottomContent(
                         layerListFragment,
@@ -228,6 +236,11 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
                 }
             }
         });
+    }
+
+    @Override
+    public void onSceneLoaded(){
+        viewModel.getLoadingState().postValue(false);
     }
 
     @Override
@@ -417,9 +430,17 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
                     case R.id.apply:
                         viewModel.startPreview(WallpaperEditor.this);
                         break;
-                    case R.id.pause:
-                        viewModel.playPauseEngine();
-                        menuItem.setTitle(R.string.resume);
+                    case R.id.save:
+                        viewModel.saveProject();
+                        break;
+                    case R.id.play_pause:
+                        if (engine.playPause()) {
+                            menuItem.setTitle(R.string.stop);
+                            menuItem.setIcon(R.drawable.ic_pause);
+                        } else {
+                            menuItem.setTitle(R.string.resume);
+                            menuItem.setIcon(R.drawable.ic_play);
+                        }
                         break;
                     default:
                         break;
@@ -437,91 +458,6 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
     }
 
     @SuppressLint("CheckResult")
-    /*private void showObjectParameters() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        ObjectParametersViewBinding dialogBinding = ObjectParametersViewBinding.bind(getLayoutInflater().inflate(R.layout.object_parameters_view, null));
-        builder.setView(dialogBinding.getRoot());
-
-        dialogBinding.title.setText(R.string.loading);
-        dialogBinding.loadingIndicator.startShimmerAnimation();
-
-        AlertDialog dialog = builder.create();
-        dialog.getWindow().setBackgroundDrawableResource(R.drawable.rounded_bottom_dialog);
-        dialog.show();
-
-        Observable.just(engine.getDraggedSpriteId())
-                .subscribeOn(Schedulers.io())
-                .map(engine::getObject)
-                .observeOn(AndroidSchedulers.mainThread())
-                .delay(500, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
-                .subscribe(actor -> {
-                    //Position
-                    dialogBinding.x.setText(String.valueOf(actor.getActorX()));
-                    dialogBinding.y.setText(String.valueOf(actor.getActorY()));
-
-                    //Scale
-                    dialogBinding.scaleX.setText(String.valueOf(actor.getActorWidth()));
-                    dialogBinding.scaleY.setText(String.valueOf(actor.getActorHeight()));
-
-                    //Rotation
-                    dialogBinding.rotation.setText(String.valueOf(actor.getActorRotation()));
-
-                    dialogBinding.title.setText(actor.getName());
-                    dialogBinding.button.setText(R.string.cancel);
-                    dialogBinding.button.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.red)));
-                    dialogBinding.button.setTextColor(ColorStateList.valueOf(getColor(R.color.red)));
-                    dialogBinding.button2.setText(R.string.apply);
-
-                    dialogBinding.button.setOnClickListener(view -> dialog.dismiss());
-                    dialogBinding.button2.setOnClickListener(view -> {
-                        if (checkInfoFields(dialogBinding.x) &&
-                                checkInfoFields(dialogBinding.y) &&
-                                checkInfoFields(dialogBinding.scaleX) &&
-                                checkInfoFields(dialogBinding.scaleY) &&
-                                checkInfoFields(dialogBinding.rotation)
-                        ) {
-                            actor.setActorPosition(
-                                    Float.parseFloat(dialogBinding.x.getText().toString()),
-                                    Float.parseFloat(dialogBinding.y.getText().toString())
-                            );
-                            actor.setActorHeight(
-                                    Float.parseFloat(dialogBinding.scaleY.getText().toString())
-                            );
-                            actor.setActorWidth(
-                                    Float.parseFloat(dialogBinding.scaleX.getText().toString())
-                            );
-                            actor.setActorRotation(
-                                    Float.parseFloat(dialogBinding.rotation.getText().toString())
-                            );
-                            dialog.dismiss();
-                        } else {
-                            snackMessage(getString(R.string.errorEmptyFields), dialogBinding.getRoot());
-                        }
-                    });
-
-                    dialogBinding.loadingIndicator.stopShimmerAnimation();
-                    dialogBinding.loadingIndicator.setVisibility(View.GONE);
-                    dialogBinding.positionLayout.setVisibility(View.VISIBLE);
-                    dialogBinding.scaleLayout.setVisibility(View.VISIBLE);
-                    dialogBinding.rotationLayout.setVisibility(View.VISIBLE);
-                    dialogBinding.buttonsLayout.setVisibility(View.VISIBLE);
-                }, throwable -> {
-                    dialogBinding.loadingIndicator.stopShimmerAnimation();
-                    dialogBinding.loadingIndicator.setVisibility(View.GONE);
-                    dialogBinding.title.setText(R.string.error_getting_data);
-                    dialogBinding.buttonsLayout.setVisibility(View.VISIBLE);
-                    dialogBinding.button2.setVisibility(View.GONE);
-                    dialogBinding.buttonsSpace.setVisibility(View.GONE);
-                    dialogBinding.button.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.red)));
-                    dialogBinding.button.setText(R.string.cancel);
-                    dialogBinding.button.setTextColor(ColorStateList.valueOf(getColor(R.color.red)));
-                    dialogBinding.button.setOnClickListener(v -> dialog.dismiss());
-                });
-    }*/
-
-
-
     private void showSaveChangesDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -530,7 +466,7 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
 
         dialogBinding.title.setText(R.string.save_before_exit);
         dialogBinding.description.setText(R.string.unsaved_data_remove);
-        dialogBinding.image.setImageResource(R.drawable.test_mascot);
+        dialogBinding.image.setVisibility(View.GONE);
         dialogBinding.button.setText(R.string.no);
         dialogBinding.button.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.red)));
         dialogBinding.button.setTextColor(ColorStateList.valueOf(getColor(R.color.red)));
@@ -563,17 +499,37 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
     }
 
     @SuppressLint("CheckResult")
-    private void showSceneParameters(){
+    private void showSceneParameters() {
         Observable
                 .just(new SimpleInputBottomDialog.Builder(this)
                         .setTitle(getString(R.string.scene_parameters))
-                        .addLabel("fdsfdsf")
+                        .addTextField("backgroundColor", getString(R.string.background_color), "color", Integer.MIN_VALUE, Integer.MAX_VALUE, engine.getBackgroundColor())
                         .build())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(dialog -> {
                     dialog.show(getSupportFragmentManager(), "scene parameters");
-                    dialog.setInputFieldCallback((typeName, value) -> {
+                    dialog.setInputFieldCallback((typeName, value) -> {});
+                    dialog.setColorPickerCallback(editText -> {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+                        ColorPickerViewBinding dialogBinding = ColorPickerViewBinding.bind(getLayoutInflater().inflate(R.layout.color_picker_view, null));
+                        builder.setView(dialogBinding.getRoot());
+
+                        AlertDialog colorPickerDialog = builder.create();
+                        colorPickerDialog.getWindow().setBackgroundDrawableResource(R.drawable.rounded_bottom_dialog);
+                        colorPickerDialog.show();
+
+                        dialogBinding.colorPicker.setColor(engine.getBackgroundColor().toIntBits());
+
+                        dialogBinding.apply.setOnClickListener(v -> {
+                            String color = String.format("#%06X", (0xFFFFFF & (dialogBinding.colorPicker.getColor())));
+                            editText.setText(color);
+                            engine.setBackgroundColor(color);
+                            colorPickerDialog.dismiss();
+                        });
+
+                        dialogBinding.cancel.setOnClickListener(v -> colorPickerDialog.dismiss());
                     });
                 });
     }
@@ -596,10 +552,12 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
                     dialog.show(getSupportFragmentManager(), actor.getName() + " parameters");
                     dialog.setInputFieldCallback((typeName, value) -> {
                         if (typeName.equals("name")) {
-                            actor.setName(value.toString());
                             actor.getImageActor().setName(value.toString());
                             getSupportActionBar().setTitle(getString(R.string.object_appbar_letter) + value);
-                            //todo fix name setting
+                            if(Boolean.TRUE.equals(viewModel.getBottomSheetOpenedLiveData().getValue()) &&
+                                    Objects.equals(viewModel.getCurrentBottomContentLiveData().getValue(), "layers")){
+                                layerListFragment.onResume();
+                            }
                         }
                         if (typeName.equals("xpos")) {
                             actor.setActorPosition(Float.parseFloat(value.toString()), actor.getActorY());
@@ -668,7 +626,6 @@ public class WallpaperEditor extends AppCompatActivity implements AndroidFragmen
 
     private void hideLoading() {
         binding.loadingWindow.setVisibility(View.GONE);
-        binding.loadingIndicator.stopShimmerAnimation();
     }
 
     private void showLoading() {

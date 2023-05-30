@@ -162,11 +162,16 @@ public class InfoFragment extends BottomSheetDialogFragment {
 
     private void fillTextData(){
         binding.name.setText(item.getName());
-        if(item.isLocal())
+        if(item.isLocal()) {
             binding.author.setText(R.string.you);
-        else
+        } else {
             binding.author.setText(item.getAuthor());
-        binding.description.setText(item.getDescription());
+        }
+        if (item.getDescription().equals("")){
+            binding.description.setText(R.string.empty);
+        }else {
+            binding.description.setText(item.getDescription());
+        }
         binding.stars.setText(String.valueOf(item.getStars()));
         binding.resolution.setText(item.getWidth()+"x"+item.getHeight());
         binding.size.setText(ProjectManager.getProjectSize(requireContext(), item.getId()));
@@ -191,7 +196,7 @@ public class InfoFragment extends BottomSheetDialogFragment {
         for(String tag:item.getTags()){
             TypedValue typedValue = new TypedValue();
             Resources.Theme theme = requireContext().getTheme();
-            TextView tagView = new TextView(getContext());
+            TextView tagView = new TextView(requireContext());
             FlexboxLayout.LayoutParams tagLayoutParams = new FlexboxLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             tagLayoutParams.setMargins(0, 15, 15, 0);
             tagView.setLayoutParams(tagLayoutParams);
@@ -204,6 +209,16 @@ public class InfoFragment extends BottomSheetDialogFragment {
             tagView.setTextColor(typedValue.data);
             tagView.setTextSize(14);
             binding.tags.addView(tagView);
+        }
+
+        if (item.getTags().size()==0){
+            TypedValue typedValue = new TypedValue();
+            Resources.Theme theme = requireContext().getTheme();
+            TextView textView = new TextView(requireContext());
+            textView.setText(R.string.empty);
+            theme.resolveAttribute(R.attr.foregroundBlackWhite, typedValue, true);
+            textView.setTextColor(typedValue.data);
+            binding.tags.addView(textView);
         }
     }
 

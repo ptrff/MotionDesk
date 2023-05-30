@@ -35,30 +35,11 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <RelativeLayout
+        <FrameLayout
+            android:id="@+id/preview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <FrameLayout
-                android:id="@+id/preview"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?backgroundBlackWhite" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/floatingActionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginEnd="15dp"
-                android:layout_marginBottom="15dp"
-                android:alpha="0.5"
-                android:backgroundTint="?colorSecondary"
-                android:src="@drawable/ic_parameters"
-                android:visibility="gone" />
-
-        </RelativeLayout>
+            android:layout_height="match_parent"
+            android:background="?backgroundBlackWhite" />
     </LinearLayout>
 
     <LinearLayout
@@ -156,21 +137,21 @@
         android:id="@+id/loading_window"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
-        android:clickable="true">
+        android:clickable="true"
+        android:visibility="gone">
 
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?backgroundBlackWhite"
-            android:alpha="0.5"/>
+            android:alpha="0.5"
+            android:background="?backgroundBlackWhite" />
 
         <androidx.cardview.widget.CardView
             android:layout_width="150dp"
             android:layout_height="150dp"
-            app:cardCornerRadius="@dimen/card_corners"
             android:layout_centerInParent="true"
             android:backgroundTint="?backgroundBlackWhite"
+            app:cardCornerRadius="@dimen/card_corners"
             app:cardElevation="0dp">
 
             <ru.ptrff.motiondesk.view.ShimmerView

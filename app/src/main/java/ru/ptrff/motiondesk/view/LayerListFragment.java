@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import ru.ptrff.motiondesk.adapters.EffectsListAdapter;
 import ru.ptrff.motiondesk.adapters.LayerListAdapter;
 import ru.ptrff.motiondesk.databinding.FragmentEditorLayersBinding;
 import ru.ptrff.motiondesk.engine.scene.ActorHandler;
@@ -34,16 +35,22 @@ public class LayerListFragment extends Fragment implements LayerListAdapter.Laye
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentEditorLayersBinding.inflate(inflater);
-
-        adapter = new LayerListAdapter(engine.getStageActorArray(), this);
-        binding.layerList.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true));
-        binding.layerList.setAdapter(adapter);
-
-        ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
-        touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(binding.layerList);
-
         return binding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(binding != null) {
+            adapter = new LayerListAdapter(engine.getStageActorArray(), this);
+            binding.layerList.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true));
+            binding.layerList.setAdapter(adapter);
+
+            ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
+            touchHelper = new ItemTouchHelper(callback);
+            touchHelper.attachToRecyclerView(binding.layerList);
+        }
     }
 
     public void notifyItemInserted(int position){

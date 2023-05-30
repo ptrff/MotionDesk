@@ -1,6 +1,8 @@
 package ru.ptrff.motiondesk.viewmodel;
 
 import android.app.Application;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -13,45 +15,44 @@ import java.util.concurrent.Executors;
 
 import ru.ptrff.motiondesk.models.BrowseSector;
 import ru.ptrff.motiondesk.models.WallpaperItem;
+import ru.ptrff.motiondesk.utils.IDGenerator;
 
 public class BrowseViewModel extends AndroidViewModel {
 
     private final MutableLiveData<List<BrowseSector>> sectorsLiveData;
-    private final MutableLiveData<List<Integer>> scrollPositions;
-    private List<BrowseSector> sectorsList;
-    List<WallpaperItem> itemsList;
-    private final List<Integer> positionsList;
+    private final MutableLiveData<List<WallpaperItem>> wallpapersLiveData;
+    private final List<BrowseSector> sectorsList;
+    private final List<WallpaperItem> itemsList;
     private final Executor executor = Executors.newSingleThreadExecutor();
 
 
     public BrowseViewModel(@NonNull Application application) {
         super(application);
         sectorsLiveData = new MutableLiveData<>();
-        scrollPositions = new MutableLiveData<>();
+        sectorsList = new ArrayList<>();
         itemsList = new ArrayList<>();
-        positionsList = new ArrayList();
-        addFirst();
-    }
-
-    public MutableLiveData<List<BrowseSector>> getSectorsLiveData(){
-        return sectorsLiveData;
+        wallpapersLiveData = new MutableLiveData<>();
     }
 
     public void init(int pos) {
         executor.execute(() -> {
-            while (pos+5>itemsList.size()) {
-                /*itemsList.add(
-                        new WallpaperItem(itemsList.size()+1, "Название обоев",
+            while (pos + 5 > itemsList.size()) {
+                itemsList.add(
+                        new WallpaperItem(true, IDGenerator.generateID(),
+                                "Название",
                                 "i_petroff",
-                                "description",
-                                new Random().nextInt(100)/10f,
-                                "Для всех",
-                                "link"
+                                "",
+                                1080,
+                                1920,
+                                "scene2d",
+                                0,
+                                false
                         )
-                );*/
+                );
+                wallpapersLiveData.postValue(itemsList);
             }
 
-            while (pos+5>sectorsList.size()) {
+            while (pos + 5 > sectorsList.size()) {
                 sectorsList.add(
                         new BrowseSector("Реки емае",
                                 null,
@@ -64,34 +65,11 @@ public class BrowseViewModel extends AndroidViewModel {
         });
     }
 
-    private void addFirst() {
-        itemsList = new ArrayList<>();
-        sectorsList = new ArrayList<>();
-        /*itemsList.add(
-                new WallpaperItem(itemsList.size()+1, "Название обоев",
-                        "i_petroff",
-                        "description",
-                        150 + new Random().nextInt(500),
-                        "Для всех",
-                        "link"
-                )
-        );*/
-        sectorsList.add(
-                new BrowseSector("Реки емае",
-                        null,
-                        itemsList,
-                        sectorsList.size()
-                )
-        );
-        sectorsLiveData.setValue(sectorsList);
+    public MutableLiveData<List<BrowseSector>> getSectorsListLiveData() {
+        return sectorsLiveData;
     }
 
-    public MutableLiveData<List<Integer>> getScrollPosition() {
-        return scrollPositions;
-    }
-
-    public void setScrollPosition(int sectorId, int position) {
-        positionsList.set(sectorId, position);
-        scrollPositions.setValue(positionsList);
+    public MutableLiveData<List<WallpaperItem>> getWallpapersLiveData() {
+        return wallpapersLiveData;
     }
 }

@@ -83,4 +83,11 @@
     <string name="error_environment_setup">Ошибка подготовки окружения</string>
     <string name="error_start_preview">Ошибка сборки проекта</string>
     <string name="scene_parameters">Параметры сцены</string>
+    <string name="choose_color">Выберите цвет:</string>
+    <string name="choose">Выбрать</string>
+    <string name="pause">Пауза</string>
+    <string name="background_color">Цвет фона</string>
+    <string name="description_colon">Описание:</string>
+    <string name="to_preview_save_once">Для предпросмотра сохраните проект хотя бы раз</string>
+    <string name="empty">Пусто</string>
 </resources>

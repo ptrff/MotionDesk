@@ -42,8 +42,6 @@ public class MainViewModel extends AndroidViewModel {
                 fragment = profileFragment;
                 break;
             case 3:
-                fragment = new EditProfileFragment();
-                break;
             case 4:
                 fragment = new EditProfileFragment();
                 break;

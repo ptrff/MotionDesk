@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".view.WallpaperPreview">
 
     <FrameLayout
@@ -12,35 +12,48 @@
         android:layout_height="match_parent"
         android:background="?backgroundBlackWhite" />
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:alpha="0.5"
-        app:elevation="0dp"
-        android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?backgroundBlackWhite"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:layout_scrollFlags="enterAlways" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:alpha="0.5"
-        android:layout_marginBottom="15dp"
-        android:layout_marginEnd="15dp"
-        android:backgroundTint="?colorSecondary"
-        android:src="@drawable/ic_parameters" />
+        android:layout_marginStart="@dimen/distance_l"
+        android:layout_marginEnd="@dimen/distance_l"
+        android:layout_marginBottom="@dimen/distance_l"
+        android:alpha="0.7"
+        android:background="@drawable/rounded_bottom_dialog"
+        android:gravity="center">
 
+        <ImageButton
+            android:id="@+id/cancel"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="@dimen/distance_l"
+            android:layout_marginEnd="15dp"
+            android:background="@drawable/rounded_outline_button"
+            android:backgroundTint="@color/red"
+            android:src="@drawable/ic_back"
+            app:tint="@color/red" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/apply"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_outline_button"
+            android:backgroundTint="?colorAccent"
+            android:text="@string/apply"
+            android:textColor="?colorAccent" />
+
+        <ImageButton
+            android:id="@+id/parameters"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="@dimen/distance_l"
+            android:background="@drawable/rounded_outline_button"
+            android:backgroundTint="?colorSecondary"
+            android:src="@drawable/ic_parameters"
+            app:tint="?colorSecondary" />
+
+    </LinearLayout>
 
 </RelativeLayout>

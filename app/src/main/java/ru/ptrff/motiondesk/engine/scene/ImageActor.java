@@ -44,23 +44,6 @@ public class ImageActor extends Actor {
         stroke.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
-    public ImageActor(int width, int height, Color color) {
-        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA4444);
-        pixmap.setColor(color);
-        pixmap.fillRectangle(0, 0, width, height);
-        Texture texture = new Texture(pixmap);
-        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        region = texture;
-        //shadowTexture = null;
-        pixmap.dispose();
-
-        setSize(width, height);
-        setBounds(0, 0,
-                region.getWidth(), region.getHeight());
-        stroke = generateStroke();
-        stroke.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-    }
-
     public String getName(){
         return name;
     }
@@ -83,8 +66,6 @@ public class ImageActor extends Actor {
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
 
-        //if(shadowTexture!=null) batch.draw(shadowTexture, getX() + 100 * MathUtils.cosDeg(0), getY() + 100 * MathUtils.sinDeg(0), getWidth(), getHeight());
-
         if (hasStroke) {
 
             batch.draw(
@@ -102,7 +83,7 @@ public class ImageActor extends Actor {
         return region;
     }
 
-    public void changeName(String name){
+    public void setName(String name){
         this.name = name;
     }
 

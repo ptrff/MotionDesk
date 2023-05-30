@@ -49,8 +49,9 @@ public class ActorHandler extends VfxWidgetGroup {
     }
 
     public void addEffects(List<BaseEffect> effects){
-        for(BaseEffect effect:effects)
+        for(BaseEffect effect:effects){
             addEffect(effect);
+        }
     }
 
     public List<BaseEffect> getEffects() {
@@ -72,12 +73,10 @@ public class ActorHandler extends VfxWidgetGroup {
 
     public void setActorSize(float width, float height) {
         getImageActor().setSize(width, height);
-        if (mask) getMask().setSize(width, height);
     }
 
     public void setActorPosition(float x, float y) {
         getImageActor().setPosition(x, y);
-        if(mask) getMask().setPosition(x, y);
     }
 
     public void setActorZoomAmount(float zoomAmount) {
@@ -130,8 +129,6 @@ public class ActorHandler extends VfxWidgetGroup {
     }
 
     public void addMask(){
-        if(!mask) addActor(new MaskActor((int) getActorWidth(), (int) getActorHeight(), (int) getActorX(), (int) getActorY()));
-
         mask = true;
     }
 
@@ -144,13 +141,6 @@ public class ActorHandler extends VfxWidgetGroup {
         mask = false;
     }
 
-    public MaskActor getMask(){
-        if(mask){
-            return (MaskActor) getChild(1);
-        }else {
-            return null;
-        }
-    }
 
     public boolean haveMask(){
         return mask;
@@ -160,10 +150,7 @@ public class ActorHandler extends VfxWidgetGroup {
         return lockStatus;
     }
 
-    public void drawMask(float x, float y, float deltaX, float deltaY) {
-        if(getMask()!=null)
-            getMask().pan(x, y, deltaX, deltaY);
-    }
+    public void drawMask(float x, float y, float deltaX, float deltaY) {}
 
     public void setActorRotation(float rotation){
         getImageActor().setRotation(rotation);

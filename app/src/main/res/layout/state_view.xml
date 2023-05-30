@@ -13,7 +13,6 @@
         android:layout_width="175dp"
         android:layout_height="175dp"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
         android:scaleType="fitCenter"
         tools:src="@drawable/ic_info" />
 
@@ -21,6 +20,7 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
         android:gravity="center"

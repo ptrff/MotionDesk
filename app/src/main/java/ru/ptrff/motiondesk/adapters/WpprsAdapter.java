@@ -81,6 +81,10 @@ public class WpprsAdapter extends ListAdapter<WallpaperItem, WpprsAdapter.ViewHo
             });
         }
 
+        if(item.isLocal()){
+            holder.binding.starsBackground.setVisibility(View.GONE);
+        }
+
 
         holder.binding.name.setText(item.getName());
         holder.binding.number.setText(item.getDescription());

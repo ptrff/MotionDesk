@@ -30,8 +30,4 @@ public class WallpaperItemRepository {
     public Completable removeWallpaperItemById(String id) {
         return wallpaperItemDao.removeWallpaperItemById(id);
     }
-
-    public Single<WallpaperItem> getWallpaperItemById(String id){
-        return wallpaperItemDao.getWallpaperItemById(id);
-    }
 }

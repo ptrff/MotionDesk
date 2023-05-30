@@ -8,6 +8,6 @@ public interface EngineEventsListener {
     void onStartDrawingMask(int index);
     void onStopDrawingMask();
     void onEffectAdded();
-
+    void onSceneLoaded();
     void snackMessage(String message);
 }

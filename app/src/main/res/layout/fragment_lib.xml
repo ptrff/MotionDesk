@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".view.LibFragment">
 
@@ -11,8 +11,8 @@
         android:id="@+id/lib_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/lib_recycler"
@@ -21,6 +21,18 @@
             android:layout_gravity="center"
             android:foregroundGravity="center"
             android:paddingRight="8dp" />
+
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <ImageView
+        android:id="@+id/no_projects"
+        android:scaleType="fitStart"
+        android:layout_gravity="end"
+        android:visibility="gone"
+        android:paddingRight="5dp"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/new_proj_ru"
+        app:tint="?foregroundBlackWhite" />
 
 </FrameLayout>

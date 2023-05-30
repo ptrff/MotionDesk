@@ -96,7 +96,6 @@ public class GlitchEffect extends BaseEffect {
 
     }
 
-
     @Override
     public void update(float delta) {
         super.update(delta);

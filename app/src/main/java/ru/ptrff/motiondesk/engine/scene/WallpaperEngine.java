@@ -4,10 +4,13 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.transition.Scene;
 import android.util.Log;
+import android.util.Pair;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -29,10 +32,13 @@ import com.google.gson.JsonObject;
 import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import ru.ptrff.motiondesk.data.local.WallpaperItemRepository;
+import ru.ptrff.motiondesk.models.SceneParameters;
 import ru.ptrff.motiondesk.models.WallpaperItem;
 import ru.ptrff.motiondesk.utils.JSONFormatter;
 import ru.ptrff.motiondesk.utils.ProjectManager;
@@ -40,46 +46,36 @@ import ru.ptrff.motiondesk.utils.ProjectManager;
 public class WallpaperEngine extends WallpaperEngineBase implements Screen {
 
     //Base
+    private static final String TAG = "WallpaperEngine";
     private boolean playing = true;
+    private final String currentProjectId;
+    private final Context context;
 
     //Scene
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private StageWrapper stage;
-
-    private Array<ActorHandler> preparedActors;
-    private boolean loadAfterPrepare = false;
+    private SceneParameters sceneParameters;
+    private Color backgroundColor = Color.BLACK;
+    private boolean loading = true;
 
     private WallpaperItem wallpaperItem;
 
     //Loading
     private BitmapFont font;
+    private BitmapFont infoFont;
     private float dotAnimationTime;
     private String loadingText;
-
-    float textWidth;
-    float textHeight;
+    private String loadingInfo;
     float scaleFactor = 1;
 
-    @SuppressLint("CheckResult")
     public WallpaperEngine(Context context) {
+        this.context = context;
         SharedPreferences sharedPreferences = context.getSharedPreferences("MotionDesk", Context.MODE_PRIVATE);
-        String currentProjectId = sharedPreferences.getString("current", "null");
-        if (!currentProjectId.equals("null")) {
-            WallpaperItemRepository repo = new WallpaperItemRepository(context);
-            repo
-                    .getWallpaperItemById(currentProjectId)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(wallpaperItem -> {
-                        this.wallpaperItem = wallpaperItem;
-                        loadScene(context);
-                    }, throwable -> Log.e("WallpaperEngine", "Error getting current wallpaper item from db", throwable));
-        } else {
-            Log.e("WallpaperEngine", "Error getting current wallpaper item id");
-        }
+        currentProjectId = sharedPreferences.getString("current", "null");
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void init() {
         //Camera
@@ -94,49 +90,100 @@ public class WallpaperEngine extends WallpaperEngineBase implements Screen {
 
         //Loading text
         font = new BitmapFont();
+        infoFont = new BitmapFont();
         font.getData().setScale(4);
+        infoFont.getData().setScale(2);
         dotAnimationTime = 0;
         loadingText = "Loading";
+        loadingInfo = "initialization";
 
-        recalculateFontLayout();
-
-
-        if (preparedActors != null) {
-            loadPrepared();
+        //Load scene
+        if (!currentProjectId.equals("null")) {
+            Observable
+                    .fromCallable(() -> loadScene(context))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            result -> loading = result,
+                            throwable -> Log.e("WallpaperEngine", "Error getting current wallpaper item from db", throwable)
+                    );
         } else {
-            loadAfterPrepare = true;
+            Log.e("WallpaperEngine", "Error getting current wallpaper item id");
+            loadingText = "Error";
+            loadingInfo = "project not set";
         }
     }
 
-    @SuppressLint("CheckResult")
-    private void loadScene(Context context) {
-        System.out.println(wallpaperItem.toString());
+    private boolean loadScene(Context context) {
+        JsonObject object = ProjectManager.getSceneJsonFromFolder(context, "Current");
 
-        Observable
-                .just(Objects.requireNonNull(ProjectManager.getSceneJsonFromCurrent(context)))
-                .flatMap(jsonObject -> Observable.fromCallable(() -> {
-                    Gdx.app.postRunnable(() -> addActorsFromJsonObject(jsonObject, context));
-                    return true;
-                }))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
+        if (object != null) {
+            loadSceneParameters(object);
+            addActorsFromJsonObject(object, context);
+            return false;
+        } else {
+            loadingText = "Error";
+            loadingInfo = "no scene.json in project files";
+            return true;
+        }
+    }
+
+    private void loadSceneParameters(JsonObject jsonObject) {
+        loadingInfo = "loading scene parameters";
+        JsonObject general = jsonObject.get("general").getAsJsonObject();
+        sceneParameters = JSONFormatter.getSceneParametersFromJson(general);
+        backgroundColor = Color.valueOf(sceneParameters.getBackgroundColor());
     }
 
     private void addActorsFromJsonObject(JsonObject jsonObject, Context context) {
         JsonArray objects = jsonObject.get("objects").getAsJsonArray();
-        preparedActors = JSONFormatter.JsonArrayToActors(objects, context);
-        if (loadAfterPrepare) {
-            loadPrepared();
-        }
-    }
 
-    private void loadPrepared() {
-        for (ActorHandler actor : preparedActors) {
-            stage.add(actor);
-            stage.addActor(actor);
-        }
-        loadAfterPrepare = false;
+        loadingInfo = "loading objects textures";
+
+        Array<Pair<Pixmap, JsonObject>> pairs = JSONFormatter.JsonArrayToPairs(objects, context, "Current");
+
+        Log.i(TAG, "Textures uploaded and converted, adding actors");
+
+        Gdx.app.postRunnable(() -> {
+            for (Pair<Pixmap, JsonObject> pair : pairs) {
+                JsonObject actorData = pair.second;
+                Log.i(TAG, "Adding  " + actorData.get("name").getAsString());
+                loadingInfo = "Adding  " + actorData.get("name").getAsString();
+
+                Texture texture = new Texture(pair.first);
+
+                ImageActor imageActor = new ImageActor(texture, actorData.get("name").getAsString());
+
+                ActorHandler actor = new ActorHandler(imageActor);
+
+                actor.setActorPosition(
+                        actorData.get("x").getAsFloat(),
+                        actorData.get("y").getAsFloat()
+                );
+                actor.setActorRotation(
+                        actorData.get("rotation").getAsFloat()
+                );
+                actor.setActorSize(
+                        actorData.get("width").getAsFloat(),
+                        actorData.get("height").getAsFloat()
+                );
+                actor.setVisibility(
+                        actorData.get("visibility").getAsBoolean()
+                );
+                actor.setLockStatus(
+                        actorData.get("locked").getAsBoolean()
+                );
+
+                if (!actorData.get("effects").getAsJsonArray().isEmpty()) {
+                    actor.addEffects(JSONFormatter.JsonArrayToEffects(actorData.get("effects").getAsJsonArray()));
+                }
+
+                stage.add(actor);
+                stage.addActor(actor);
+            }
+        });
+
+        Log.i(TAG, "Scene loaded");
     }
 
     @Override
@@ -161,33 +208,52 @@ public class WallpaperEngine extends WallpaperEngineBase implements Screen {
         playing = true;
     }
 
+
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1);
+        ScreenUtils.clear(backgroundColor);
         camera.update();
 
         for (ActorHandler object : stage.getObjects()) {
-            object.setWidth(Gdx.graphics.getWidth() * camera.zoom);
-            object.setHeight(Gdx.graphics.getHeight() * camera.zoom);
-            object.setPosition(camera.position.x - Gdx.graphics.getWidth() * camera.zoom / 2, camera.position.y - Gdx.graphics.getHeight() * camera.zoom / 2);
+            object.setWidth(Gdx.graphics.getWidth());
+            object.setHeight(Gdx.graphics.getHeight());
+            object.setPosition(camera.position.x - Gdx.graphics.getWidth() / 2f, camera.position.y - Gdx.graphics.getHeight() / 2f);
         }
 
-        if (loadAfterPrepare) {
-            dotAnimationTime += delta;
-            if (dotAnimationTime > 0.5f) {
-                dotAnimationTime = 0;
-                loadingText += ".";
-                if (loadingText.length() > 10) {
-                    loadingText = "Loading";
-                    scaleFactor*=-1;
+        if (loading) {
+            if (!loadingText.equals("Error")) {
+                dotAnimationTime += delta;
+                if (dotAnimationTime > 0.5f) {
+                    dotAnimationTime = 0;
+                    loadingText += ".";
+                    if (loadingText.length() > 10) {
+                        loadingText = "Loading";
+                        scaleFactor *= -1;
+                    }
                 }
+                float scale = font.getData().scaleX;
+                font.getData().setScale(scale + scaleFactor * dotAnimationTime * 0.05f);
             }
-            float scale = font.getData().scaleX;
-            font.getData().setScale(scale+scaleFactor*dotAnimationTime*0.05f);
-            recalculateFontLayout();
+
+            Pair<Float, Float> loadingTextSize = recalculateFontLayout(font, loadingText);
+            Pair<Float, Float> infoTextSize = recalculateFontLayout(infoFont, loadingInfo);
+
 
             batch.begin();
-            font.draw(batch, loadingText, Gdx.graphics.getWidth() / 2f - textWidth / 2f, Gdx.graphics.getHeight() / 2f + textHeight / 2f);
+            font.draw(
+                    batch,
+                    loadingText,
+                    Gdx.graphics.getWidth() / 2f - loadingTextSize.first / 2f,
+                    Gdx.graphics.getHeight() / 2f + loadingTextSize.second / 2f
+            );
+
+            infoFont.draw(
+                    batch,
+                    loadingInfo,
+                    Gdx.graphics.getWidth() / 2f - infoTextSize.first / 2f,
+                    Gdx.graphics.getHeight() / 2f - loadingTextSize.second * 2
+            );
+
             batch.end();
         } else if (playing) {
             stage.act(delta);
@@ -195,10 +261,9 @@ public class WallpaperEngine extends WallpaperEngineBase implements Screen {
         }
     }
 
-    private void recalculateFontLayout(){
+    private Pair<Float, Float> recalculateFontLayout(BitmapFont font, String text) {
         GlyphLayout layout = new GlyphLayout();
-        layout.setText(font, "Loading");
-        textWidth = layout.width;
-        textHeight = layout.height;
+        layout.setText(font, text);
+        return new Pair<>(layout.width, layout.height);
     }
 }

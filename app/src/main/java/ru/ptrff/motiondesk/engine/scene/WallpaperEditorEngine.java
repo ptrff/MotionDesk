@@ -1,7 +1,13 @@
 package ru.ptrff.motiondesk.engine.scene;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.util.Log;
+import android.util.Pair;
+
+import androidx.core.content.ContextCompat;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -19,27 +25,38 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.io.ByteArrayOutputStream;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.engine.effects.BaseEffect;
 import ru.ptrff.motiondesk.engine.effects.GlitchEffect;
 import ru.ptrff.motiondesk.engine.effects.WindEffect;
 import ru.ptrff.motiondesk.engine.effects.ParallaxEffect;
 import ru.ptrff.motiondesk.engine.effects.ShakeEffect;
+import ru.ptrff.motiondesk.models.SceneParameters;
+import ru.ptrff.motiondesk.models.WallpaperItem;
 import ru.ptrff.motiondesk.utils.JSONFormatter;
+import ru.ptrff.motiondesk.utils.ProjectManager;
 import ru.ptrff.motiondesk.utils.ZipMaster;
 
 public class WallpaperEditorEngine extends WallpaperEngineBase implements GestureDetector.GestureListener {
 
     //Base
+    private static final String TAG = "WallpaperEditorEngine";
     private final EngineEventsListener engineEventsListener;
     private int height;
     private int width;
     private boolean playing = true;
     private Resources resources;
+    private Context context;
+    private String currentProjectId = "null";
 
     //Scene
     private OrthographicCamera camera;
@@ -47,7 +64,8 @@ public class WallpaperEditorEngine extends WallpaperEngineBase implements Gestur
     private TextureRegion backgroundTexture;
     private Batch batch;
     private StageWrapper stage;
-    //List<ActorHandler> objects;
+    private Color backgroundColor;
+    private SceneParameters sceneParameters;
 
     //Gestures
     private int draggedSpriteId = 0;
@@ -63,12 +81,21 @@ public class WallpaperEditorEngine extends WallpaperEngineBase implements Gestur
     private final Vector2 initialTouch1 = new Vector2();
     private final Vector2 initialTouch2 = new Vector2();
 
+    public WallpaperEditorEngine(WallpaperItem item, String id, EngineEventsListener listener, Context context){
+        width = item.getWidth();
+        height = item.getHeight();
+        engineEventsListener = listener;
+        currentProjectId = id;
+        this.context = context;
+    }
+
     public WallpaperEditorEngine(int width, int height, EngineEventsListener listener) {
         this.width = width;
         this.height = height;
         engineEventsListener = listener;
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void init() {
         //Camera
@@ -80,18 +107,38 @@ public class WallpaperEditorEngine extends WallpaperEngineBase implements Gestur
 
         //Scene
         stage = new StageWrapper(new ScreenViewport(camera), batch);
-        //stage = new ArrayList<>();
+        backgroundColor = Color.valueOf("#212121");
 
+        if (!currentProjectId.equals("null")) {
+            Observable
+                    .fromCallable(() -> loadScene(context))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            result -> engineEventsListener.onSceneLoaded(),
+                            throwable -> Log.e("WallpaperEngine", "Error getting current wallpaper item from db", throwable)
+                    );
+        } else {
+            Log.i(TAG, "Loading sample scene");
 
-        ActorHandler a = createImage("kitik.jpg");
-        a.setActorPosition(100, 100);
-        stage.addActor(a);
-        ActorHandler b = createImage("kitik.jpg");
-        b.setActorPosition(200, 200);
-        stage.addActor(b);
-        ActorHandler c = createImage("kitik.jpg");
-        c.setActorPosition(300, 300);
-        stage.addActor(c);
+            //parameters
+            sceneParameters = new SceneParameters("#212121");
+            backgroundColor = Color.valueOf(sceneParameters.getBackgroundColor());
+
+            //actors
+            ActorHandler a = createImage("kitik.jpg");
+            a.setActorPosition(100, 100);
+            stage.addActor(a);
+            ActorHandler b = createImage("kitik.jpg");
+            b.setActorPosition(200, 200);
+            stage.addActor(b);
+            ActorHandler c = createImage("kitik.jpg");
+            c.setActorPosition(300, 300);
+            stage.addActor(c);
+
+            engineEventsListener.onSceneLoaded();
+        }
+
 
         createWorkingAreaBackground(width, height);
         centerCamera(-1);
@@ -102,14 +149,85 @@ public class WallpaperEditorEngine extends WallpaperEngineBase implements Gestur
     public ActorHandler createImage(String imagePath) {
         Texture texture = new Texture(imagePath);
         texture.unsafeSetWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.MirroredRepeat, true);
-        ImageActor image = new ImageActor(texture, "fdsf" + stage.getActors().size);
-        ActorHandler actor = new ActorHandler(image);
-        return actor;
+        ImageActor image = new ImageActor(texture, "kitik #" + stage.getActors().size);
+        return new ActorHandler(image);
+    }
+
+    private boolean loadScene(Context context) {
+        ProjectManager.unpackProjectToFolder(context, currentProjectId, "Temp");
+
+        JsonObject object = ProjectManager.getSceneJsonFromFolder(context, "Temp");
+
+        if (object != null) {
+            loadSceneParameters(object);
+            addActorsFromJsonObject(object, context);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private void loadSceneParameters(JsonObject jsonObject) {
+        JsonObject general = jsonObject.get("general").getAsJsonObject();
+        sceneParameters = JSONFormatter.getSceneParametersFromJson(general);
+        backgroundColor = Color.valueOf(sceneParameters.getBackgroundColor());
+    }
+
+    private void addActorsFromJsonObject(JsonObject jsonObject, Context context) {
+        JsonArray objects = jsonObject.get("objects").getAsJsonArray();
+
+        Array<Pair<Pixmap, JsonObject>> pairs = JSONFormatter.JsonArrayToPairs(objects, context, "Temp");
+
+        Log.i(TAG, "Textures uploaded and converted, adding actors");
+
+        Gdx.app.postRunnable(() -> {
+            for (Pair<Pixmap, JsonObject> pair : pairs) {
+                JsonObject actorData = pair.second;
+                Log.i(TAG, "Adding  " + actorData.get("name").getAsString());
+
+                Texture texture = new Texture(pair.first);
+
+                ImageActor imageActor = new ImageActor(texture, actorData.get("name").getAsString());
+
+                ActorHandler actor = new ActorHandler(imageActor);
+
+                actor.setActorPosition(
+                        actorData.get("x").getAsFloat(),
+                        actorData.get("y").getAsFloat()
+                );
+                actor.setActorRotation(
+                        actorData.get("rotation").getAsFloat()
+                );
+                actor.setActorSize(
+                        actorData.get("width").getAsFloat(),
+                        actorData.get("height").getAsFloat()
+                );
+                actor.setVisibility(
+                        actorData.get("visibility").getAsBoolean()
+                );
+                actor.setLockStatus(
+                        actorData.get("locked").getAsBoolean()
+                );
+
+
+                //if(object.get("masked").getAsBoolean())
+
+                if (!actorData.get("effects").getAsJsonArray().isEmpty()) {
+                    actor.addEffects(JSONFormatter.JsonArrayToEffects(actorData.get("effects").getAsJsonArray()));
+                }
+
+                stage.add(actor);
+                stage.addActor(actor);
+            }
+        });
+
+        Log.i(TAG, "Scene loaded");
     }
 
     public boolean isObjectSelected() {
         return dragSprite || canDragObject;
     }
+
 
     public void startDrawingMask() {
         twoFingerMovement = true;
@@ -183,12 +301,6 @@ public class WallpaperEditorEngine extends WallpaperEngineBase implements Gestur
 
     public void addImage(Bitmap bitmap) {
         Gdx.app.postRunnable(() -> {
-//            Texture texture = new Texture(bitmap.getWidth(), bitmap.getHeight(), Pixmap.Format.RGBA8888);
-//            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture.getTextureObjectHandle());
-//            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
-//            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
-//            bitmap.recycle();
-
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
@@ -228,16 +340,7 @@ public class WallpaperEditorEngine extends WallpaperEngineBase implements Gestur
     }
 
     public void removeObject() {
-        //stage.get(draggedSpriteId).dispose();
-
-//        stage.act();
-
         stage.getActors().removeValue(stage.get(draggedSpriteId), true);
-
-//        stage.get(draggedSpriteId).getImageActor().remove();
-//        stage.get(draggedSpriteId).remove();
-
-
         engineEventsListener.onObjectRemoved(draggedSpriteId);
         engineEventsListener.onObjectNotSelected();
         canDragObject = false;
@@ -248,9 +351,6 @@ public class WallpaperEditorEngine extends WallpaperEngineBase implements Gestur
         return stage.get(index);
     }
 
-//    public List<ActorHandler> getObjectList(){
-//        return stage;
-//    }
 
     public Array<ActorHandler> getStageActorArray() {
         return stage.getObjects();
@@ -287,23 +387,27 @@ public class WallpaperEditorEngine extends WallpaperEngineBase implements Gestur
         playing = true;
     }
 
-    public void playPause() {
-        if (playing) pause();
-        else resume();
+    public boolean playPause() {
+        if (playing){
+            pause();
+            return false;
+        } else {
+            resume();
+            return true;
+        }
     }
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1);
+        ScreenUtils.clear(backgroundColor);
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         if (backgroundTexture != null) {
-            batch.draw(backgroundTexture, Gdx.graphics.getWidth() / 2 - workingArea.getWidth() / 2, Gdx.graphics.getHeight() / 2 - workingArea.getHeight() / 2);
+            batch.draw(backgroundTexture, Gdx.graphics.getWidth() / 2f - workingArea.getWidth() / 2, Gdx.graphics.getHeight() / 2f - workingArea.getHeight() /2);
         }
         batch.end();
-
 
         for (ActorHandler object : stage.getObjects()) {
             object.setWidth(Gdx.graphics.getWidth() * camera.zoom);
@@ -313,6 +417,15 @@ public class WallpaperEditorEngine extends WallpaperEngineBase implements Gestur
 
         if (playing) stage.act(delta);
         stage.draw();
+    }
+
+    public Color getBackgroundColor(){
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(String color){
+        backgroundColor = Color.valueOf(color);
+        sceneParameters.setBackgroundColor(color);
     }
 
     private int checkForActors(float x, float y) {
@@ -491,8 +604,9 @@ public class WallpaperEditorEngine extends WallpaperEngineBase implements Gestur
             ImageActor actor = getStageActorArray().get(i).getImageActor();
             zipMaster.addTexture(actor.getTexture(), actor.getName());
         }
+        Gson gson = new Gson();
         JsonObject jsonObject = new JsonObject();
-        jsonObject.add("general", null);
+        jsonObject.add("general", gson.toJsonTree(sceneParameters));
         jsonObject.add("objects", JSONFormatter.actorsToJsonArray(getStageActorArray()));
         zipMaster.setSceneJson(jsonObject);
         return zipMaster;

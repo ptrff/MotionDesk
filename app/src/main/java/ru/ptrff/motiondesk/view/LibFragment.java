@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.transition.Explode;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -72,27 +74,27 @@ public class LibFragment extends Fragment {
         viewModel.refresh();
     }
 
-    /*private void generateWhileScrolling() {
-        binding.libRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if(sGrid.findFirstVisibleItemPosition()!=viewModel.getScrollPosition().getValue()){
-                    viewModel.init(); //sGrid.findLastVisibleItemPosition()
-                }
-            }
-        });
-    }*/
-
     private void observeContent(){
         viewModel.getWallpaperItemsLiveData().observe(getViewLifecycleOwner(), wallpaperItems -> {
             adapter.submitList(null);
             adapter.submitList(wallpaperItems);
-            //binding.libRecycler.setAdapter(adapter);
+            if(wallpaperItems.isEmpty()) {
+                binding.noProjects.setVisibility(View.VISIBLE);
+            }else{
+                binding.noProjects.setVisibility(View.GONE);
+            }
         });
     }
 
     private void setupPullToRefresh() {
+        Resources.Theme theme = requireActivity().getTheme();
+        TypedValue foregroundValue = new TypedValue();
+        TypedValue backgroundValue = new TypedValue();
+        theme.resolveAttribute(R.attr.foregroundBlackWhite, foregroundValue, false);
+        theme.resolveAttribute(R.attr.backgroundDarkLight, backgroundValue, false);
+        binding.libRefresh.setColorSchemeResources(foregroundValue.data);
+        binding.libRefresh.setProgressBackgroundColorSchemeResource(backgroundValue.data);
+
         binding.libRefresh.setOnRefreshListener(() -> {
             viewModel.refresh();
             binding.libRefresh.setRefreshing(false);
@@ -150,7 +152,7 @@ public class LibFragment extends Fragment {
     @SuppressLint("CheckResult")
     private void startPreview(WallpaperItem item) {
         Observable.fromCallable(() -> {
-                    ProjectManager.unpackProjectToCurrent(requireContext(), item.getId());
+                    ProjectManager.unpackProjectToFolder(requireContext(), item.getId(), "Current");
                     SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MotionDesk", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("current", item.getId());

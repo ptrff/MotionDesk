@@ -24,15 +24,43 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/browse_body"
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" />
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="6dp"
+                    android:text="  • Популярное в категории _____"
+                    android:textColor="?colorAccent"
+                    android:textSize="16sp" />
+
+                <ru.ptrff.motiondesk.view.OverscrollLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:canOverScroll="true">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="true"
+                        android:overScrollMode="never" />
+
+                </ru.ptrff.motiondesk.view.OverscrollLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="12dp"
+                    android:text="(это overscroll layout ↑↑↑)"
+                    android:textColor="?colorAccent"
+                    android:textSize="16sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:layout_marginBottom="?android:attr/actionBarSize"
                     android:gravity="center"
                     android:orientation="horizontal">

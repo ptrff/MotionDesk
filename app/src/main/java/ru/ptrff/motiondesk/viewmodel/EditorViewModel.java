@@ -22,6 +22,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import ru.ptrff.motiondesk.R;
+import ru.ptrff.motiondesk.data.local.WallpaperItemRepository;
 import ru.ptrff.motiondesk.engine.WallpaperLibGdxFragment;
 import ru.ptrff.motiondesk.engine.effects.BaseEffect;
 import ru.ptrff.motiondesk.engine.scene.WallpaperEditorEngine;
@@ -31,6 +32,7 @@ import ru.ptrff.motiondesk.models.WallpaperItem;
 import ru.ptrff.motiondesk.utils.BitmapProcessor;
 import ru.ptrff.motiondesk.utils.IDGenerator;
 import ru.ptrff.motiondesk.utils.ProjectManager;
+import ru.ptrff.motiondesk.utils.ZipMaster;
 import ru.ptrff.motiondesk.view.ProjectInfoFragment;
 
 public class EditorViewModel extends AndroidViewModel {
@@ -39,6 +41,7 @@ public class EditorViewModel extends AndroidViewModel {
     private final MutableLiveData<String> appBarTextLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loadingState = new MutableLiveData<>();
     private final MutableLiveData<String> snackMessageLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String> toastMessageLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> bottomSheetOpenedLiveData = new MutableLiveData<>();
     private final MutableLiveData<Void> pickImageLiveData = new MutableLiveData<>();
     private final MutableLiveData<Void> startPreviewLiveData = new MutableLiveData<>();
@@ -50,19 +53,14 @@ public class EditorViewModel extends AndroidViewModel {
     private final MutableLiveData<Void> showProjectInformation = new MutableLiveData<>();
     private final MutableLiveData<Void> showObjectParameters = new MutableLiveData<>();
     private final MutableLiveData<Void> showEffectParameters = new MutableLiveData<>();
-    private ProjectInfoFragment projectInfoFragment;
 
     //EditorEngine
-    private final MutableLiveData<WallpaperLibGdxFragment> libgdxFragmentLiveData = new MutableLiveData<>();
     private WallpaperEditorEngine engine;
     private WallpaperItem wallpaperItem;
     private int width;
     private int height;
     private String name;
     private BaseEffect currentEffect;
-
-    //EditorEngineEvents
-    private final MutableLiveData<Void> updateEffectsList = new MutableLiveData<>();
 
     //Tools
     private final MutableLiveData<List<ToolItem>> toolbarToolsLiveData = new MutableLiveData<>();
@@ -75,8 +73,6 @@ public class EditorViewModel extends AndroidViewModel {
     //BottomSheetFragments
     private final MutableLiveData<String> currentBottomContentLiveData = new MutableLiveData<>();
     private final MutableLiveData<Void> bottomSheetUpdateActionLiveData = new MutableLiveData<>();
-    private final MutableLiveData<Integer> bottomSheetRemovePositionLiveData = new MutableLiveData<>();
-    private final MutableLiveData<Integer> bottomSheetInsertPositionLiveData = new MutableLiveData<>();
 
     @SuppressLint("CheckResult")
     public EditorViewModel(@NonNull Application application) {
@@ -176,13 +172,6 @@ public class EditorViewModel extends AndroidViewModel {
                     showEditObjectTools();
                 }
         );
-        toolsRunnables.put(
-                resources.getString(R.string.save),
-                () -> {
-                    loadingState.postValue(true);
-                    saveProject();
-                }
-        );
     }
 
     public void onToolbarToolClicked(ToolItem tool) {
@@ -195,7 +184,6 @@ public class EditorViewModel extends AndroidViewModel {
 
     private void selectBottomContent(String contentName) {
         currentBottomContentLiveData.postValue(contentName);
-        System.out.println("VIEEEEEE");
         if (Boolean.FALSE.equals(bottomSheetOpenedLiveData.getValue()))
             bottomSheetOpenedLiveData.setValue(true);
         //bottomSheetFragmentLiveData.postValue(fragment);
@@ -206,14 +194,14 @@ public class EditorViewModel extends AndroidViewModel {
     }
 
     private void setupToolbar() {
-        defaultTools.add(new ToolItem(R.drawable.ic_save, resources.getString(R.string.save)));
+        //defaultTools.add(new ToolItem(R.drawable.ic_save, resources.getString(R.string.save)));
         defaultTools.add(new ToolItem(R.drawable.ic_info, resources.getString(R.string.information)));
         defaultTools.add(new ToolItem(R.drawable.ic_parameters, resources.getString(R.string.parameters)));
         defaultTools.add(new ToolItem(R.drawable.ic_layers, resources.getString(R.string.layer)));
         defaultTools.add(new ToolItem(R.drawable.ic_center_cam, resources.getString(R.string.center_obj)));
 
         editObjectTools.add(new ToolItem(R.drawable.ic_parameters, resources.getString(R.string.parameters)));
-        editObjectTools.add(new ToolItem(R.drawable.ic_mask, resources.getString(R.string.mask)));
+        //editObjectTools.add(new ToolItem(R.drawable.ic_mask, resources.getString(R.string.mask)));
         editObjectTools.add(new ToolItem(R.drawable.ic_effects, resources.getString(R.string.effects)));
         editObjectTools.add(new ToolItem(R.drawable.ic_delete, resources.getString(R.string.remove)));
 
@@ -265,53 +253,53 @@ public class EditorViewModel extends AndroidViewModel {
         }
     }
 
-    private Observable<Bitmap> resizeImage(Bitmap bitmap) {
-        return Observable.fromCallable(() -> BitmapProcessor.scaleBitmap(bitmap, 360, 540));
-    }
-
     @SuppressLint("CheckResult")
     public void saveProject() {
-        Observable
-                .just(engine.getZipMaster())
+        loadingState.postValue(true);
+        Observable<ZipMaster> zipMasterObservable =
+                Observable
+                .fromCallable(() -> engine.getZipMaster())
+                .subscribeOn(Schedulers.io());
+
+        zipMasterObservable.flatMap(zipMaster ->
+                        Observable.fromCallable(() -> {
+                            ProjectManager.createProject(getApplication(), wallpaperItem, zipMaster);
+                            return true;
+                        }))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(zipMaster -> {
-                    ProjectManager.createProject(
-                            getApplication(),
-                            wallpaperItem,
-                            zipMaster
-                    );
-                    loadingState.postValue(false);
-                }, throwable -> {
-                    loadingState.postValue(false);
-                    snackMessageLiveData.postValue(resources.getString(R.string.saving_project_error));
-                    Log.e("WallpaperEditor", resources.getString(R.string.saving_project_error), throwable);
-                });
+                .subscribe(unused -> loadingState.postValue(false),
+                        throwable -> {
+                            loadingState.postValue(false);
+                            snackMessageLiveData.postValue(resources.getString(R.string.saving_project_error));
+                            Log.e("WallpaperEditor", resources.getString(R.string.saving_project_error), throwable);
+                        });
     }
 
     @SuppressLint("CheckResult")
     public void startPreview(Context context) {
-        loadingState.postValue(true);
-        Observable.fromCallable(() -> {
-                    saveProject();
-                    return true;
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .flatMap(result -> Observable.fromCallable(() -> {
-                    ProjectManager.unpackProjectToCurrent(context, wallpaperItem.getId());
-                    SharedPreferences sharedPreferences = context.getSharedPreferences("MotionDesk", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("current", wallpaperItem.getId());
-                    editor.apply();
-                    return true;
-                }))
-                .subscribe(result -> {
-                    startPreviewLiveData.postValue(null);
-                }, error -> {
-                    snackMessageLiveData.postValue(context.getString(R.string.error_start_preview));
-                    Log.e("WallpaperEditor", "Error starting preview", error);
-                });
+        if (ProjectManager.projectExists(context, wallpaperItem.getId())) {
+            loadingState.postValue(true);
+            Observable.fromCallable(() -> {
+                        ProjectManager.unpackProjectToFolder(context, wallpaperItem.getId(), "Current");
+                        SharedPreferences sharedPreferences = context.getSharedPreferences("MotionDesk", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("current", wallpaperItem.getId());
+                        editor.apply();
+                        return true;
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(result -> {
+                        loadingState.postValue(false);
+                        startPreviewLiveData.postValue(null);
+                    }, error -> {
+                        snackMessageLiveData.postValue(context.getString(R.string.error_start_preview));
+                        Log.e("WallpaperEditor", "Error starting preview", error);
+                    });
+        } else {
+            toastMessageLiveData.postValue(context.getString(R.string.to_preview_save_once));
+        }
     }
 
     public void setWidth(int width) {
@@ -347,10 +335,6 @@ public class EditorViewModel extends AndroidViewModel {
         }
     }
 
-    public void playPauseEngine() {
-        engine.playPause();
-    }
-
     public String getName() {
         return name;
     }
@@ -375,14 +359,6 @@ public class EditorViewModel extends AndroidViewModel {
         return startPreviewLiveData;
     }
 
-    public MutableLiveData<Integer> getBottomSheetRemovePositionLiveData() {
-        return bottomSheetRemovePositionLiveData;
-    }
-
-    public MutableLiveData<Integer> getBottomSheetInsertPositionLiveData() {
-        return bottomSheetInsertPositionLiveData;
-    }
-
     public MutableLiveData<Boolean> getLoadingState() {
         return loadingState;
     }
@@ -395,17 +371,10 @@ public class EditorViewModel extends AndroidViewModel {
         return showEffectParameters;
     }
 
-    public ProjectInfoFragment getProjectParametersFragment() {
-        return projectInfoFragment;
-    }
-
     public MutableLiveData<Void> getShowProjectParameters() {
         return showProjectParameters;
     }
 
-    public MutableLiveData<WallpaperLibGdxFragment> getLibgdxFragmentLiveData() {
-        return libgdxFragmentLiveData;
-    }
 
     public MutableLiveData<List<ToolItem>> getToolbarToolsLiveData() {
         return toolbarToolsLiveData;
@@ -423,16 +392,16 @@ public class EditorViewModel extends AndroidViewModel {
         return bottomSheetOpenedLiveData;
     }
 
+    public MutableLiveData<String> getToastMessageLiveData() {
+        return toastMessageLiveData;
+    }
+
     public MutableLiveData<String> getAppBarTextLiveData() {
         return appBarTextLiveData;
     }
 
     public MutableLiveData<String> getSnackMessageLiveData() {
         return snackMessageLiveData;
-    }
-
-    public MutableLiveData<Void> getUpdateEffectsList() {
-        return updateEffectsList;
     }
 
     public MutableLiveData<Void> getShowObjectParameters() {

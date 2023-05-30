@@ -1,15 +1,10 @@
 package ru.ptrff.motiondesk.view;
 
-import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.Rect;
 
-import androidx.core.view.NestedScrollingChild;
 import androidx.core.view.NestedScrollingChildHelper;
-import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,13 +12,11 @@ import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import ru.ptrff.motiondesk.R;
 
@@ -34,7 +27,7 @@ public class OverscrollLayout extends RelativeLayout {
     private int overScrollStateChangeSize;
     private float damping;
     private float indicatorDamping;
-    private RecyclerView mChildView;
+    private RecyclerView childView;
     private ImageView overScrollIcon;
     private final Rect originalRect = new Rect();
     private float startX;
@@ -43,8 +36,7 @@ public class OverscrollLayout extends RelativeLayout {
     private boolean isMoved;
     private boolean intercept;
     private boolean canOverScroll;
-    private OnOverScrollReleaseListener mOnOverScrollReleaseListener;
-    private final NestedScrollingChildHelper mNestedScrollingChildHelper;
+    private OnOverScrollReleaseListener onOverScrollReleaseListener;
     boolean vibrated = false;
 
 
@@ -67,9 +59,7 @@ public class OverscrollLayout extends RelativeLayout {
         indicatorDamping = ta.getFloat(R.styleable.OverscrollLayout_indicatorDamping, .2f);
         ta.recycle();
 
-        mNestedScrollingChildHelper = new NestedScrollingChildHelper(this);
         setNestedScrollingEnabled(true);
-
     }
 
 
@@ -84,14 +74,14 @@ public class OverscrollLayout extends RelativeLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        if (mChildView == null) {
+        if (childView == null) {
             for (int i = 0; i < getChildCount(); i++) {
                 if (getChildAt(i) instanceof RecyclerView) {
-                    mChildView = (RecyclerView) getChildAt(i);
+                    childView = (RecyclerView) getChildAt(i);
                 }
             }
         }
-        mChildView.measure(
+        childView.measure(
                 MeasureSpec.makeMeasureSpec(getMeasuredWidth() - getPaddingLeft() - getPaddingRight(), MeasureSpec.AT_MOST),
                 MeasureSpec.makeMeasureSpec(getMeasuredHeight() - getPaddingTop() - getPaddingBottom(), MeasureSpec.AT_MOST));
 
@@ -102,9 +92,9 @@ public class OverscrollLayout extends RelativeLayout {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int width = mChildView.getMeasuredWidth();
-        int height = mChildView.getMeasuredHeight();
-        mChildView.layout(0, 0, width, height);
+        int width = childView.getMeasuredWidth();
+        int height = childView.getMeasuredHeight();
+        childView.layout(0, 0, width, height);
 
         int textTop = (int) (height / 2f - overScrollIcon.getMeasuredHeight() / 2f);
         int textBottom = (int) (height / 2f + overScrollIcon.getMeasuredHeight() / 2f);
@@ -147,7 +137,7 @@ public class OverscrollLayout extends RelativeLayout {
                 if (isCanPullLeft() && scrollX < 0) {
                     int absScrollX = Math.abs((int) ((nowX - startX) * damping));
                     int textScrollX = Math.abs((int) ((nowX - startX) * indicatorDamping));
-                    mChildView.setTranslationX(-absScrollX);
+                    childView.setTranslationX(-absScrollX);
                     if (absScrollX < overScrollSize) {
                         requestDisallowInterceptTouchEvent(true);
                         if (absScrollX >= overScrollStateChangeSize) {
@@ -197,17 +187,17 @@ public class OverscrollLayout extends RelativeLayout {
             return;
         }
 
-        mChildView.animate()
+        childView.animate()
                 .setDuration(animDuration)
-                .translationX(-mChildView.getLeft());
+                .translationX(-childView.getLeft());
 
         overScrollIcon.animate()
                 .setDuration((long) (animDuration * (damping / indicatorDamping)))
                 .translationX(-scrollX * indicatorDamping);
 
         if (overScrollSize >= overScrollStateChangeSize) {
-            if (mOnOverScrollReleaseListener != null && vibrated) {
-                mOnOverScrollReleaseListener.onRelease();
+            if (onOverScrollReleaseListener != null && vibrated) {
+                onOverScrollReleaseListener.onRelease();
             }
         }
     }
@@ -217,21 +207,21 @@ public class OverscrollLayout extends RelativeLayout {
             return false;
         }
 
-        final RecyclerView.Adapter adapter = mChildView.getAdapter();
+        final RecyclerView.Adapter adapter = childView.getAdapter();
         if (adapter == null) {
             return true;
         }
         final int lastItemPosition = adapter.getItemCount() - 1;
-        final int lastVisiblePosition = ((LinearLayoutManager) mChildView.getLayoutManager()).findLastVisibleItemPosition();
+        final int lastVisiblePosition = ((LinearLayoutManager) childView.getLayoutManager()).findLastVisibleItemPosition();
 
         if (lastVisiblePosition >= lastItemPosition) {
-            final int childIndex = lastVisiblePosition - ((LinearLayoutManager) mChildView.getLayoutManager()).findFirstVisibleItemPosition();
-            final int childCount = mChildView.getChildCount();
+            final int childIndex = lastVisiblePosition - ((LinearLayoutManager) childView.getLayoutManager()).findFirstVisibleItemPosition();
+            final int childCount = childView.getChildCount();
             final int index = Math.min(childIndex, childCount - 1);
-            final View lastVisibleChild = mChildView.getChildAt(index);
+            final View lastVisibleChild = childView.getChildAt(index);
             if (lastVisibleChild != null) {
                 return lastVisibleChild.getRight() + ((MarginLayoutParams) lastVisibleChild.getLayoutParams()).rightMargin
-                        <= mChildView.getRight() - mChildView.getLeft();
+                        <= childView.getRight() - childView.getLeft();
             }
         }
 
@@ -287,7 +277,7 @@ public class OverscrollLayout extends RelativeLayout {
     }
 
     public void setOnOverScrollReleaseListener(OnOverScrollReleaseListener onOverScrollReleaseListener) {
-        mOnOverScrollReleaseListener = onOverScrollReleaseListener;
+        this.onOverScrollReleaseListener = onOverScrollReleaseListener;
     }
 
     public interface OnOverScrollReleaseListener {
