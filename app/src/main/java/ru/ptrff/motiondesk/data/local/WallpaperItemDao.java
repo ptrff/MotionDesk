@@ -27,4 +27,7 @@ public interface WallpaperItemDao {
 
     @Query("SELECT * FROM wallpaper_items WHERE id = :id")
     Single<WallpaperItem> getWallpaperItemById(String id);
+
+    @Query("SELECT * FROM wallpaper_items WHERE name LIKE '%' || :name || '%'")
+    Flowable<List<WallpaperItem>> getWallpapersByName(String name);
 }

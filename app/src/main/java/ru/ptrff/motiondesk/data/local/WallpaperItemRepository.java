@@ -6,7 +6,6 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import ru.ptrff.motiondesk.models.WallpaperItem;
 
@@ -29,5 +28,9 @@ public class WallpaperItemRepository {
 
     public Completable removeWallpaperItemById(String id) {
         return wallpaperItemDao.removeWallpaperItemById(id);
+    }
+
+    public Flowable<List<WallpaperItem>> getWallpaperItemsByName(String name) {
+        return wallpaperItemDao.getWallpapersByName(name);
     }
 }

@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.badlogic.gdx.utils.Array;
 
+import java.util.Scanner;
+
 import ru.ptrff.motiondesk.R;
 import ru.ptrff.motiondesk.databinding.LayerItemBinding;
 import ru.ptrff.motiondesk.engine.scene.ActorHandler;

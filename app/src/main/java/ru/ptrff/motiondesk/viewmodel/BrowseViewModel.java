@@ -1,5 +1,6 @@
 package ru.ptrff.motiondesk.viewmodel;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.util.Log;
 import android.widget.Toast;
@@ -13,28 +14,64 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import ru.ptrff.motiondesk.data.local.WallpaperItemRepository;
 import ru.ptrff.motiondesk.models.BrowseSector;
 import ru.ptrff.motiondesk.models.WallpaperItem;
 import ru.ptrff.motiondesk.utils.IDGenerator;
 
 public class BrowseViewModel extends AndroidViewModel {
 
-    private final MutableLiveData<List<BrowseSector>> sectorsLiveData;
-    private final MutableLiveData<List<WallpaperItem>> wallpapersLiveData;
-    private final List<BrowseSector> sectorsList;
-    private final List<WallpaperItem> itemsList;
-    private final Executor executor = Executors.newSingleThreadExecutor();
+    private final MutableLiveData<List<WallpaperItem>> wallpaperItemsLiveData;
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final WallpaperItemRepository repo;
 
-
+    @SuppressLint("CheckResult")
     public BrowseViewModel(@NonNull Application application) {
         super(application);
-        sectorsLiveData = new MutableLiveData<>();
-        sectorsList = new ArrayList<>();
-        itemsList = new ArrayList<>();
-        wallpapersLiveData = new MutableLiveData<>();
+        wallpaperItemsLiveData = new MutableLiveData<>();
+
+        repo = new WallpaperItemRepository(application);
+
+        repo
+                .getAllWallpaperItems()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(wallpaperItemsLiveData::postValue);
     }
 
-    public void init(int pos) {
+    public MutableLiveData<List<WallpaperItem>> getWallpaperItemsLiveData() {
+        return wallpaperItemsLiveData;
+    }
+
+    public void searchWallpaperItems(String query) {
+        repo
+                .getWallpaperItemsByName(query)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(wallpaperItemsLiveData::postValue);
+    }
+
+    public void refresh() {
+        Disposable disposable = repo.getAllWallpaperItems()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(wallpaperItemsLiveData::postValue);
+
+        compositeDisposable.add(disposable);
+    }
+
+    @Override
+    protected void onCleared() {
+        compositeDisposable.clear();
+        super.onCleared();
+    }
+
+
+    /*public void init(int pos) {
         executor.execute(() -> {
             while (pos + 5 > itemsList.size()) {
                 itemsList.add(
@@ -63,13 +100,13 @@ public class BrowseViewModel extends AndroidViewModel {
                 sectorsLiveData.postValue(sectorsList);
             }
         });
-    }
+    }*/
 
-    public MutableLiveData<List<BrowseSector>> getSectorsListLiveData() {
+   /* public MutableLiveData<List<BrowseSector>> getSectorsListLiveData() {
         return sectorsLiveData;
     }
 
     public MutableLiveData<List<WallpaperItem>> getWallpapersLiveData() {
         return wallpapersLiveData;
-    }
+    }*/
 }

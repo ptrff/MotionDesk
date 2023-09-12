@@ -12,6 +12,15 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/browse_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:foregroundGravity="center"
+            android:paddingRight="8dp" />
+
+        <!--
         <androidx.core.widget.NestedScrollView
             android:id="@+id/scroll"
             android:layout_width="match_parent"
@@ -84,7 +93,7 @@
 
             </LinearLayout>
 
-        </androidx.core.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>-->
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

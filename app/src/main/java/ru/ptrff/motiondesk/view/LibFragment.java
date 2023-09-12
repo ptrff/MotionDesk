@@ -71,7 +71,7 @@ public class LibFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        viewModel.refresh();
+        //viewModel.refresh();
     }
 
     private void observeContent(){
